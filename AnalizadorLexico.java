@@ -28,4 +28,15 @@ public class AnalizadorLexico {
         ARITMETICOS.put('*', "MULTIPLICACION");
         ARITMETICOS.put('/', "DIVISION");
     }
+
+    //operadores de agrupación del lenguaje Rafi
+    private static final Map<Character, String> AGRUPACION = new LinkedHashMap<>();
+    static{
+        AGRUPACION.put('(', "PARENTESIS_ABIERTO");
+        AGRUPACION.put(')', "PARENTESIS_CERRADO");
+        AGRUPACION.put('{', "LLAVE_ABIERTA");
+        AGRUPACION.put('}', "LLAVE_CERRADA");
+        AGRUPACION.put('[', "CORCHETE_ABIERTO");
+        AGRUPACION.put(']', "CORCHETE_CERRADO");
+    }   
 }
