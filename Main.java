@@ -12,6 +12,7 @@ public class Main {
         // Puedes cambiar esta ruta por la ubicación de tu archivo .txt
         String rutaArchivo = "progfte.txt";
         String rutaDepurado = "progfte.dep";
+        String rutaVariables = "variables.txt";
 
 
         // ── Leer el archivo completo a un String ─────────────────────────────
@@ -34,6 +35,15 @@ public class Main {
             System.out.println("Verifica que tienes permisos de escritura en la carpeta.");
         }
 
+        //generar archivo de variables
+        String variables = obtenerVariables(codigoFuente);
+        try{
+            Files.writeString(Path.of(rutaVariables), variables);
+            System.out.println("Archivo de variables generado: " + rutaVariables);
+        }catch (IOException e) {
+            System.out.println("ERROR: No se pudo escribir el archivo de variables '" + rutaVariables + "'");
+            System.out.println("Verifica que tienes permisos de escritura en la carpeta.");
+        }
 
         // ── Analizar el codigo fuente original ─────────────────────────────────────────────────────────
         AnalizadorLexico alex = new AnalizadorLexico();
@@ -134,6 +144,12 @@ public class Main {
         }
 
         return resultado.toString().trim(); // Eliminar espacios al inicio y al final
+    }
+
+    //METODO PARA OBTENER LAS VARIABLES DECLARADAS EN EL CODIGO FUENTE
+    private static String obtenerVariables(String codigoFuente) {
+        // Implementación del método para obtener variables
+        return "";
     }
 }
 
