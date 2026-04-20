@@ -70,6 +70,61 @@ public class Main {
 
     //METODO PARA DEPURAR EL CODIGO FUENTE (ELIMINAR COMENTARIOS Y ESPACIOS INNECESARIOS)
     private static String depurar(String entrada) {
+        StringBuilder resultado = new StringBuilder();
+        int i = 0;
+
+        while ( i < entrada.length()) {
+            char c = entrada.charAt(i);
+
+            // Eliminar comentarios /* ... */
+            if (c == '/' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '*') {
+                i += 2; // Saltar "/*"
+                while (i + 1 < entrada.length()) {
+                    if (entrada.charAt(i) == '*' && entrada.charAt(i + 1) == '/') {
+                        i += 2; // Saltar "*/"
+                        break;
+                    }
+                    i++;
+                }
+                continue;
+            }
+
+            //conservar saltos de linea para mantener la estructura
+            if (c == '\n'){
+                // Solo agregar el salto si la línea actual no está vacía
+                String lineaActual = resultado.toString();
+                int ultimoSalto   = lineaActual.lastIndexOf('\n');
+                String ultimaLinea = (ultimoSalto == -1)
+                        ? lineaActual.trim()
+                        : lineaActual.substring(ultimoSalto + 1).trim();
+
+                if (!ultimaLinea.isEmpty()) {
+                    resultado.append('\n');
+                }
+                i++;
+                continue;
+            }
+
+            //Eliminar tabuladores o retornos de carro
+            if(c == '\t' || c == '\r'){
+                // Reemplazar tabulador por un espacio simple
+                if (c == '\t') resultado.append(' ');
+                i++;
+                continue;
+            }
+
+             // Eliminar espacios múltiples consecutivos → dejar solo uno
+            if (c == ' ') {
+                // Verificar si el último carácter agregado ya es un espacio
+                if (resultado.length() > 0 &&
+                    resultado.charAt(resultado.length() - 1) != ' ' &&
+                    resultado.charAt(resultado.length() - 1) != '\n') {
+                    resultado.append(' ');
+                }
+                i++;
+                continue;
+            }
+        }
     }
 }
 
