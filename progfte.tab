@@ -1,0 +1,7 @@
+No.   | NOMBRE VARIABLE      | TIPO         | VALOR      | LÍNEA
+-----------------------------------------------------------
+1     | a                    | entero       | 0          | 4
+2     | b                    | entero       | 0          | 4
+3     | c                    | entero       | 0          | 4
+4     | d                    | cadena       | ""         | 5
+5     | e                    | booleano     | false      | 6
