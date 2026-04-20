@@ -70,9 +70,11 @@ public class Main {
 
     //METODO PARA DEPURAR EL CODIGO FUENTE (ELIMINAR COMENTARIOS Y ESPACIOS INNECESARIOS)
     private static String depurar(String entrada) {
+        // Usamos StringBuilder para construir el código depurado de manera eficiente
         StringBuilder resultado = new StringBuilder();
         int i = 0;
 
+        // Recorrer cada carácter del código fuente
         while ( i < entrada.length()) {
             char c = entrada.charAt(i);
 
@@ -94,9 +96,10 @@ public class Main {
                 // Solo agregar el salto si la línea actual no está vacía
                 String lineaActual = resultado.toString();
                 int ultimoSalto   = lineaActual.lastIndexOf('\n');
+                // Obtener el contenido de la última línea después del último salto de línea
                 String ultimaLinea = (ultimoSalto == -1)
-                        ? lineaActual.trim()
-                        : lineaActual.substring(ultimoSalto + 1).trim();
+                        ? lineaActual.trim()// Si no hay saltos, toda la cadena es la última línea
+                        : lineaActual.substring(ultimoSalto + 1).trim();// Si hay saltos, obtener la última línea después del último salto
 
                 if (!ultimaLinea.isEmpty()) {
                     resultado.append('\n');
@@ -113,7 +116,7 @@ public class Main {
                 continue;
             }
 
-             // Eliminar espacios múltiples consecutivos → dejar solo uno
+             // Eliminar espacios múltiples consecutivos -> dejar solo uno
             if (c == ' ') {
                 // Verificar si el último carácter agregado ya es un espacio
                 if (resultado.length() > 0 &&
@@ -124,7 +127,13 @@ public class Main {
                 i++;
                 continue;
             }
+
+            //cualquiera otro carácter se agrega al resultado
+            resultado.append(c);
+            i++;
         }
+
+        return resultado.toString().trim(); // Eliminar espacios al inicio y al final
     }
 }
 
