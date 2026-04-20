@@ -11,14 +11,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ── Ruta del archivo fuente ──────────────────────────────────────────
-        // Puedes cambiar esta ruta por la ubicación de tu archivo .txt
-        String rutaArchivo = "progfte.txt";
+        // ── Rutas de archivos ────────────────────────────────────────────────
+        String rutaArchivo  = "progfte.txt";
         String rutaDepurado = "progfte.dep";
-        String rutaTabla = "progfte.tab";
+        String rutaTabla    = "progfte.tab";
+        String rutaTokens   = "progfte.tok";
 
-
-        // ── Leer el archivo completo a un String ─────────────────────────────
+        // ── Leer el archivo fuente ───────────────────────────────────────────
         String codigoFuente;
         try {
             codigoFuente = Files.readString(Path.of(rutaArchivo));
@@ -28,124 +27,183 @@ public class Main {
             return;
         }
 
-        // Generar archivo depurado .dep
+        // ── Generar archivo depurado .dep ────────────────────────────────────
         String codigoDepurado = depurar(codigoFuente);
-        try{
+        try {
             Files.writeString(Path.of(rutaDepurado), codigoDepurado);
-            System.out.println("Archivo depurado generado: " + rutaDepurado);
+            System.out.println("Archivo depurado generado  : " + rutaDepurado);
         } catch (IOException e) {
-            System.out.println("ERROR: No se pudo escribir el archivo depurado '" + rutaDepurado + "'");
-            System.out.println("Verifica que tienes permisos de escritura en la carpeta.");
+            System.out.println("ERROR: No se pudo escribir el archivo '" + rutaDepurado + "'");
         }
 
-        // ── Analizar el codigo fuente original ─────────────────────────────────────────────────────────
+        // ── Analizar el código fuente ────────────────────────────────────────
         AnalizadorLexico alex = new AnalizadorLexico();
         List<Token> tokens = alex.analizar(codigoFuente);
 
-        //generar tabla de simbolos .tab
+        // ── Construir tabla de símbolos ──────────────────────────────────────
         Map<String, String[]> tablaSimbolos = construirTablaSimbolos(tokens);
-        String contenidoTabla = generarArchivoTabla(tablaSimbolos); 
+
+        // ── Generar archivo .tab ─────────────────────────────────────────────
+        String contenidoTabla = generarContenidoTabla(tablaSimbolos);
         try {
             Files.writeString(Path.of(rutaTabla), contenidoTabla);
-            System.out.println("Tabla de símbolos generada: " + rutaTabla);
+            System.out.println("Tabla de símbolos generada : " + rutaTabla);
         } catch (IOException e) {
             System.out.println("ERROR: No se pudo escribir el archivo '" + rutaTabla + "'");
         }
-        
-        //imprimir tabla de simbolos en consola
-        System.out.println("\n------------------------------------------------");
-        System.out.println("  TABLA DE SIMBOLOS -> " + rutaArchivo);
-        System.out.println("------------------------------------------------");
-       System.out.print(contenidoTabla);
-       
-        // ── Tabla de tokens ──────────────────────────────────────────────────
-        System.out.println("-----------------------------------------------------");
-        System.out.println("  TABLA DE TOKENS -> " + rutaArchivo);
-        System.out.println("------------------------------------------------------");
-        System.out.printf("%-8s | %-20s | %-22s | %s%n",
-                          "LINEA", "NOMBRE", "TIPO", "LEXEMA");
-        System.out.println("------------------------------------------------------");
 
-        for (Token t : tokens) {
-            System.out.println(t);
+        // ── Generar archivo .tok (tabla de símbolos + lista de tokens) ───────
+        String contenidoTok = generarArchivoTok(tablaSimbolos, tokens, alex.getErrores());
+        try {
+            Files.writeString(Path.of(rutaTokens), contenidoTok);
+            System.out.println("Archivo de tokens generado : " + rutaTokens);
+        } catch (IOException e) {
+            System.out.println("ERROR: No se pudo escribir el archivo '" + rutaTokens + "'");
         }
 
-        // ── Errores léxicos ──────────────────────────────────────────────────
-        System.out.println("\n-----------------------------------------------------------");
-        List<String> errores = alex.getErrores();
-        if (errores.isEmpty()) {
-            System.out.println("Análisis completado sin errores léxicos.");
-        } else {
-            System.out.println("  ERRORES LÉXICOS ENCONTRADOS:");
-            errores.forEach(System.out::println);
-        }
-        System.out.println("-----------------------------------------------------------");
-
-        // ── Resumen ──────────────────────────────────────────────────────────
-        System.out.println("\n  Total de tokens generados : " + tokens.size());
-        System.out.println("  Total de errores léxicos  : " + errores.size());
-        System.out.println("Total de variables declaradas : " + tablaSimbolos.size());
+        // ── Mostrar resumen en consola ───────────────────────────────────────
+        System.out.println("\n" + contenidoTok);
     }
 
-    //METODO PARA CONSTRUIR LA TABLA DE SIMBOLOS A PARTIR DE LOS TOKENS ANALIZADOS
-    private static Map<String, String[]> construirTablaSimbolos(List<Token> tokens) {
-        // Clave   → nombre de la variable
-        // Valor   → arreglo con [tipo, valorInicial, linea]
-        Map<String, String[]> tabla = new LinkedHashMap<>();
+    // ────────────────────────────────────────────────────────────────────────
+    //  GENERAR ARCHIVO .tok
+    //  Contiene: encabezado, tabla de símbolos y lista completa de tokens
+    // ────────────────────────────────────────────────────────────────────────
+    private static String generarArchivoTok(Map<String, String[]> tabla,
+                                             List<Token> tokens,
+                                             List<String> errores) {
+        StringBuilder sb = new StringBuilder();
+        String separador  = "=".repeat(65) + "\n";
+        String divisor    = "-".repeat(65) + "\n";
 
-        boolean dentroDecl = false; // true cuando estamos en la sección decl
-        String tipoActual  = "";    // tipo que se está procesando (entero, cadena, booleano)
+        // ── Encabezado del archivo ───────────────────────────────────────────
+        sb.append(separador);
+        sb.append("  ANALIZADOR LÉXICO — LENGUAJE RAFI\n");
+        sb.append("  Archivo: progfte.tok\n");
+        sb.append(separador);
+        sb.append("\n");
+
+        // ── SECCIÓN 1: Tabla de símbolos ─────────────────────────────────────
+        sb.append(separador);
+        sb.append("  SECCIÓN 1 — TABLA DE SÍMBOLOS\n");
+        sb.append(separador);
+        sb.append(String.format("%-5s | %-20s | %-12s | %-10s | %s%n",
+                                "No.", "VARIABLE", "TIPO", "VALOR INIT", "LÍNEA"));
+        sb.append(divisor);
+
+        if (tabla.isEmpty()) {
+            sb.append("  (No se declararon variables)\n");
+        } else {
+            int contador = 1;
+            for (Map.Entry<String, String[]> entrada : tabla.entrySet()) {
+                String nombre = entrada.getKey();
+                String tipo   = entrada.getValue()[0];
+                String valor  = entrada.getValue()[1];
+                String linea  = entrada.getValue()[2];
+                sb.append(String.format("%-5d | %-20s | %-12s | %-10s | %s%n",
+                                        contador++, nombre, tipo, valor, linea));
+            }
+        }
+        sb.append("\n");
+
+        // ── SECCIÓN 2: Lista de tokens clasificados ──────────────────────────
+        sb.append(separador);
+        sb.append("  SECCIÓN 2 — LISTA DE TOKENS\n");
+        sb.append(separador);
+        sb.append(String.format("%-6s | %-22s | %-22s | %s%n",
+                                "LÍNEA", "NOMBRE", "TIPO", "LEXEMA"));
+        sb.append(divisor);
+
+        // Agrupar tokens por categoría para mejor lectura
+        //String categoriaActual = "";
+        for (Token t : tokens) {
+            sb.append(String.format("%-6d | %-22s | %-22s | %s%n",
+                            t.linea, t.nombre, t.tipo, t.lexema));
+        }
+        sb.append("\n");
+
+        // ── SECCIÓN 3: Resumen por categoría ─────────────────────────────────
+        sb.append(separador);
+        sb.append("  SECCIÓN 3 — RESUMEN\n");
+        sb.append(separador);
+
+        // Contar tokens por categoría
+        Map<String, Integer> conteo = new LinkedHashMap<>();
+        for (Token t : tokens) {
+            conteo.put(t.nombre, conteo.getOrDefault(t.nombre, 0) + 1);
+        }
+        for (Map.Entry<String, Integer> entrada : conteo.entrySet()) {
+            sb.append(String.format("  %-25s : %d token(s)%n",
+                                    entrada.getKey(), entrada.getValue()));
+        }
+        sb.append(divisor);
+        sb.append(String.format("  %-25s : %d%n", "TOTAL DE TOKENS",   tokens.size()));
+        sb.append(String.format("  %-25s : %d%n", "TOTAL DE VARIABLES", tabla.size()));
+        sb.append(String.format("  %-25s : %d%n", "TOTAL DE ERRORES",   errores.size()));
+        sb.append("\n");
+
+        // ── SECCIÓN 4: Errores léxicos ───────────────────────────────────────
+        sb.append(separador);
+        sb.append("  SECCIÓN 4 — ERRORES LÉXICOS\n");
+        sb.append(separador);
+        if (errores.isEmpty()) {
+            sb.append("  Sin errores léxicos.\n");
+        } else {
+            for (String error : errores) {
+                sb.append("  " + error + "\n");
+            }
+        }
+        sb.append(separador);
+
+        return sb.toString();
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    //  CONSTRUIR TABLA DE SÍMBOLOS
+    // ────────────────────────────────────────────────────────────────────────
+    private static Map<String, String[]> construirTablaSimbolos(List<Token> tokens) {
+        Map<String, String[]> tabla = new LinkedHashMap<>();
+        boolean dentroDecl = false;
+        String tipoActual  = "";
         int i = 0;
 
         while (i < tokens.size()) {
             Token t = tokens.get(i);
 
-            // Detectar inicio de sección decl
             if (t.tipo.equals("DECL")) {
                 dentroDecl = true;
                 i++;
                 continue;
             }
 
-            // Detectar fin de sección decl cuando llega "inicio"
             if (t.tipo.equals("INICIO")) {
                 dentroDecl = false;
                 i++;
                 continue;
             }
 
-            // Solo procesar dentro de decl
-            if (dentroDecl) {
-
-                // Encontramos un tipo de dato → guardar y leer las variables que siguen
-                if (t.tipo.equals("TIPO")) {
-                    tipoActual = t.lexema; // entero, cadena o booleano
-                    i++;
-
-                    // Leer todos los identificadores hasta el punto y coma
-                    while (i < tokens.size() && !tokens.get(i).tipo.equals("PC")) {
-                        Token actual = tokens.get(i);
-
-                        // Si es un identificador → agregarlo a la tabla
-                        if (actual.nombre.equals("IDENTIFICADOR")) {
-                            String nombre      = actual.lexema;
-                            String valorInicial = valorPorDefecto(tipoActual);
-                            String linea       = String.valueOf(actual.linea);
-
-                            // Verificar si la variable ya fue declarada (error semántico)
-                            if (tabla.containsKey(nombre)) {
-                                System.out.println("ADVERTENCIA: Variable '" + nombre +
-                                                   "' declarada más de una vez (línea " + linea + ")");
-                            } else {
-                                tabla.put(nombre, new String[]{tipoActual, valorInicial, linea});
-                            }
+            if (dentroDecl && t.tipo.equals("TIPO")) {
+                tipoActual = t.lexema;
+                i++;
+                while (i < tokens.size() && !tokens.get(i).tipo.equals("PC")) {
+                    Token actual = tokens.get(i);
+                    if (actual.nombre.equals("IDENTIFICADOR")) {
+                        String nombre = actual.lexema;
+                        if (tabla.containsKey(nombre)) {
+                            System.out.println("ADVERTENCIA: Variable '" + nombre +
+                                               "' declarada más de una vez (línea " + actual.linea + ")");
+                        } else {
+                            tabla.put(nombre, new String[]{
+                                tipoActual,
+                                valorPorDefecto(tipoActual),
+                                String.valueOf(actual.linea)
+                            });
                         }
-                        // Las comas (COMA) simplemente se saltan
-                        i++;
                     }
-                    i++; // saltar el punto y coma
-                    continue;
+                    i++;
                 }
+                i++; // saltar el punto y coma
+                continue;
             }
 
             i++;
@@ -154,34 +212,30 @@ public class Main {
         return tabla;
     }
 
-    //  GENERAR CONTENIDO DEL ARCHIVO .tab A PARTIR DE LA TABLA DE SÍMBOLOS
-    private static String generarArchivoTabla(Map<String, String[]> tabla) {
+    // ────────────────────────────────────────────────────────────────────────
+    //  GENERAR CONTENIDO DEL ARCHIVO .tab
+    // ────────────────────────────────────────────────────────────────────────
+    private static String generarContenidoTabla(Map<String, String[]> tabla) {
         StringBuilder sb = new StringBuilder();
-
-        // Encabezado de la tabla
         sb.append(String.format("%-5s | %-20s | %-12s | %-10s | %s%n",
-                                "No.", "NOMBRE VARIABLE", "TIPO", "VALOR", "LÍNEA"));
-        sb.append("-----------------------------------------------------------\n");
+                                "No.", "VARIABLE", "TIPO", "VALOR INIT", "LÍNEA"));
+        sb.append("-".repeat(65) + "\n");
 
-        // Filas de variables
         int contador = 1;
         for (Map.Entry<String, String[]> entrada : tabla.entrySet()) {
-            String nombre = entrada.getKey();
-            String tipo   = entrada.getValue()[0];
-            String valor  = entrada.getValue()[1];
-            String linea  = entrada.getValue()[2];
-
             sb.append(String.format("%-5d | %-20s | %-12s | %-10s | %s%n",
-                                    contador++, nombre, tipo, valor, linea));
+                                    contador++,
+                                    entrada.getKey(),
+                                    entrada.getValue()[0],
+                                    entrada.getValue()[1],
+                                    entrada.getValue()[2]));
         }
-
         return sb.toString();
     }
 
-    //  VALOR POR DEFECTO según el tipo 
-    //  entero   -> 0
-    //  cadena   -> ""  (cadena vacía)
-    //  booleano -> false
+    // ────────────────────────────────────────────────────────────────────────
+    //  VALOR POR DEFECTO según tipo
+    // ────────────────────────────────────────────────────────────────────────
     private static String valorPorDefecto(String tipo) {
         switch (tipo) {
             case "entero":   return "0";
@@ -191,22 +245,21 @@ public class Main {
         }
     }
 
-    //METODO PARA DEPURAR EL CODIGO FUENTE (ELIMINAR COMENTARIOS Y ESPACIOS INNECESARIOS)
+    // ────────────────────────────────────────────────────────────────────────
+    //  MÉTODO DEPURADOR
+    // ────────────────────────────────────────────────────────────────────────
     private static String depurar(String entrada) {
-        // Usamos StringBuilder para construir el código depurado de manera eficiente
         StringBuilder resultado = new StringBuilder();
         int i = 0;
 
-        // Recorrer cada carácter del código fuente
-        while ( i < entrada.length()) {
+        while (i < entrada.length()) {
             char c = entrada.charAt(i);
 
-            // Eliminar comentarios /* ... */
             if (c == '/' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '*') {
-                i += 2; // Saltar "/*"
+                i += 2;
                 while (i + 1 < entrada.length()) {
                     if (entrada.charAt(i) == '*' && entrada.charAt(i + 1) == '/') {
-                        i += 2; // Saltar "*/"
+                        i += 2;
                         break;
                     }
                     i++;
@@ -214,16 +267,12 @@ public class Main {
                 continue;
             }
 
-            //conservar saltos de linea para mantener la estructura
-            if (c == '\n'){
-                // Solo agregar el salto si la línea actual no está vacía
+            if (c == '\n') {
                 String lineaActual = resultado.toString();
-                int ultimoSalto   = lineaActual.lastIndexOf('\n');
-                // Obtener el contenido de la última línea después del último salto de línea
+                int ultimoSalto    = lineaActual.lastIndexOf('\n');
                 String ultimaLinea = (ultimoSalto == -1)
-                        ? lineaActual.trim()// Si no hay saltos, toda la cadena es la última línea
-                        : lineaActual.substring(ultimoSalto + 1).trim();// Si hay saltos, obtener la última línea después del último salto
-
+                        ? lineaActual.trim()
+                        : lineaActual.substring(ultimoSalto + 1).trim();
                 if (!ultimaLinea.isEmpty()) {
                     resultado.append('\n');
                 }
@@ -231,17 +280,13 @@ public class Main {
                 continue;
             }
 
-            //Eliminar tabuladores o retornos de carro
-            if(c == '\t' || c == '\r'){
-                // Reemplazar tabulador por un espacio simple
+            if (c == '\t' || c == '\r') {
                 if (c == '\t') resultado.append(' ');
                 i++;
                 continue;
             }
 
-             // Eliminar espacios múltiples consecutivos -> dejar solo uno
             if (c == ' ') {
-                // Verificar si el último carácter agregado ya es un espacio
                 if (resultado.length() > 0 &&
                     resultado.charAt(resultado.length() - 1) != ' ' &&
                     resultado.charAt(resultado.length() - 1) != '\n') {
@@ -251,13 +296,10 @@ public class Main {
                 continue;
             }
 
-            //cualquiera otro carácter se agrega al resultado
             resultado.append(c);
             i++;
         }
 
-        return resultado.toString().trim(); // Eliminar espacios al inicio y al final
+        return resultado.toString().trim();
     }
-
 }
-

@@ -1,5 +1,5 @@
-No.   | NOMBRE VARIABLE      | TIPO         | VALOR      | LÍNEA
------------------------------------------------------------
+No.   | VARIABLE             | TIPO         | VALOR INIT | LÍNEA
+-----------------------------------------------------------------
 1     | a                    | entero       | 0          | 4
 2     | b                    | entero       | 0          | 4
 3     | c                    | entero       | 0          | 4

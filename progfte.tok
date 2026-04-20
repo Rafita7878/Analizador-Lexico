@@ -1,0 +1,114 @@
+=================================================================
+  ANALIZADOR LÉXICO — LENGUAJE RAFI
+  Archivo: progfte.tok
+=================================================================
+
+=================================================================
+  SECCIÓN 1 — TABLA DE SÍMBOLOS
+=================================================================
+No.   | VARIABLE             | TIPO         | VALOR INIT | LÍNEA
+-----------------------------------------------------------------
+1     | a                    | entero       | 0          | 4
+2     | b                    | entero       | 0          | 4
+3     | c                    | entero       | 0          | 4
+4     | d                    | cadena       | ""         | 5
+5     | e                    | booleano     | false      | 6
+
+=================================================================
+  SECCIÓN 2 — LISTA DE TOKENS
+=================================================================
+LÍNEA  | NOMBRE                 | TIPO                   | LEXEMA
+-----------------------------------------------------------------
+1      | PALABRA_RESERVADA      | PROG                   | rafi
+1      | IDENTIFICADOR          | ID                     | MiPrograma
+3      | PALABRA_RESERVADA      | DECL                   | decl
+4      | PALABRA_RESERVADA      | TIPO                   | entero
+4      | IDENTIFICADOR          | ID                     | a
+4      | PUNTUACION             | COMA                   | ,
+4      | IDENTIFICADOR          | ID                     | b
+4      | PUNTUACION             | COMA                   | ,
+4      | IDENTIFICADOR          | ID                     | c
+4      | PUNTUACION             | PC                     | ;
+5      | PALABRA_RESERVADA      | TIPO                   | cadena
+5      | IDENTIFICADOR          | ID                     | d
+5      | PUNTUACION             | PC                     | ;
+6      | PALABRA_RESERVADA      | TIPO                   | booleano
+6      | IDENTIFICADOR          | ID                     | e
+6      | PUNTUACION             | PC                     | ;
+8      | PALABRA_RESERVADA      | INICIO                 | inicio
+9      | IDENTIFICADOR          | ID                     | a
+9      | ASIGNACION             | ASIG                   | :=
+9      | CONSTANTE_ENTERA       | CENT                   | 5
+9      | PUNTUACION             | PC                     | ;
+10     | IDENTIFICADOR          | ID                     | b
+10     | ASIGNACION             | ASIG                   | :=
+10     | CONSTANTE_ENTERA       | CENT                   | 3
+10     | PUNTUACION             | PC                     | ;
+11     | PALABRA_RESERVADA      | IMPCAD                 | impcad
+11     | AGRUPACION             | PARENTESIS_ABIERTO     | (
+11     | CADENA_LITERAL         | CLIT                   | "Hola mundo"
+11     | AGRUPACION             | PARENTESIS_CERRADO     | )
+11     | PUNTUACION             | PC                     | ;
+12     | PALABRA_RESERVADA      | LEERDIG                | leerdig
+12     | AGRUPACION             | PARENTESIS_ABIERTO     | (
+12     | IDENTIFICADOR          | ID                     | a
+12     | AGRUPACION             | PARENTESIS_CERRADO     | )
+12     | PUNTUACION             | PC                     | ;
+13     | IDENTIFICADOR          | ID                     | d
+13     | ASIGNACION             | ASIG                   | :=
+13     | IDENTIFICADOR          | ID                     | a
+13     | ARITMETICO             | MULTIPLICACION         | *
+13     | AGRUPACION             | PARENTESIS_ABIERTO     | (
+13     | IDENTIFICADOR          | ID                     | b
+13     | ARITMETICO             | RESTA                  | -
+13     | IDENTIFICADOR          | ID                     | c
+13     | AGRUPACION             | PARENTESIS_CERRADO     | )
+13     | PUNTUACION             | PC                     | ;
+14     | PALABRA_RESERVADA      | SI                     | si
+14     | AGRUPACION             | PARENTESIS_ABIERTO     | (
+14     | IDENTIFICADOR          | ID                     | a
+14     | ARITMETICO             | SUMA                   | +
+14     | IDENTIFICADOR          | ID                     | b
+14     | AGRUPACION             | PARENTESIS_CERRADO     | )
+14     | PALABRA_RESERVADA      | ENTONCES               | entonces
+15     | PALABRA_RESERVADA      | IMPDIG                 | impdig
+15     | AGRUPACION             | PARENTESIS_ABIERTO     | (
+15     | IDENTIFICADOR          | ID                     | a
+15     | AGRUPACION             | PARENTESIS_CERRADO     | )
+15     | PUNTUACION             | PC                     | ;
+16     | PALABRA_RESERVADA      | FIN                    | fin
+17     | PALABRA_RESERVADA      | MIENTRAS               | mientras
+17     | AGRUPACION             | PARENTESIS_ABIERTO     | (
+17     | IDENTIFICADOR          | ID                     | b
+17     | AGRUPACION             | PARENTESIS_CERRADO     | )
+17     | PALABRA_RESERVADA      | HACER                  | hacer
+18     | IDENTIFICADOR          | ID                     | b
+18     | ASIGNACION             | ASIG                   | :=
+18     | IDENTIFICADOR          | ID                     | b
+18     | ARITMETICO             | RESTA                  | -
+18     | CONSTANTE_ENTERA       | CENT                   | 1
+18     | PUNTUACION             | PC                     | ;
+19     | PALABRA_RESERVADA      | FIN                    | fin
+20     | PALABRA_RESERVADA      | FIN                    | fin
+
+=================================================================
+  SECCIÓN 3 — RESUMEN
+=================================================================
+  PALABRA_RESERVADA         : 16 token(s)
+  IDENTIFICADOR             : 19 token(s)
+  PUNTUACION                : 12 token(s)
+  ASIGNACION                : 4 token(s)
+  CONSTANTE_ENTERA          : 3 token(s)
+  AGRUPACION                : 12 token(s)
+  CADENA_LITERAL            : 1 token(s)
+  ARITMETICO                : 4 token(s)
+-----------------------------------------------------------------
+  TOTAL DE TOKENS           : 71
+  TOTAL DE VARIABLES        : 5
+  TOTAL DE ERRORES          : 0
+
+=================================================================
+  SECCIÓN 4 — ERRORES LÉXICOS
+=================================================================
+  Sin errores léxicos.
+=================================================================
