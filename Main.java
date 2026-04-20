@@ -11,6 +11,8 @@ public class Main {
         // ── Ruta del archivo fuente ──────────────────────────────────────────
         // Puedes cambiar esta ruta por la ubicación de tu archivo .txt
         String rutaArchivo = "progfte.txt";
+        String rutaDepurado = "progfte.dep";
+
 
         // ── Leer el archivo completo a un String ─────────────────────────────
         String codigoFuente;
@@ -22,7 +24,18 @@ public class Main {
             return;
         }
 
-        // ── Analizar ─────────────────────────────────────────────────────────
+        // Generar archivo depurado .dep
+        String codigoDepurado = depurar(codigoFuente);
+        try{
+            Files.writeString(Path.of(rutaDepurado), codigoDepurado);
+            System.out.println("Archivo depurado generado: " + rutaDepurado);
+        } catch (IOException e) {
+            System.out.println("ERROR: No se pudo escribir el archivo depurado '" + rutaDepurado + "'");
+            System.out.println("Verifica que tienes permisos de escritura en la carpeta.");
+        }
+
+
+        // ── Analizar el codigo fuente original ─────────────────────────────────────────────────────────
         AnalizadorLexico alex = new AnalizadorLexico();
         List<Token> tokens = alex.analizar(codigoFuente);
 
@@ -31,7 +44,7 @@ public class Main {
         System.out.println("  TABLA DE TOKENS — " + rutaArchivo);
         System.out.println("------------------------------------------------------");
         System.out.printf("%-8s | %-20s | %-22s | %s%n",
-                          "LÍNEA", "NOMBRE", "TIPO", "LEXEMA");
+                          "LINEA", "NOMBRE", "TIPO", "LEXEMA");
         System.out.println("───────────────────────────────────────────────────────────────────");
 
         for (Token t : tokens) {
@@ -53,4 +66,10 @@ public class Main {
         System.out.println("\n  Total de tokens generados : " + tokens.size());
         System.out.println("  Total de errores léxicos  : " + errores.size());
     }
+    
+
+    //METODO PARA DEPURAR EL CODIGO FUENTE (ELIMINAR COMENTARIOS Y ESPACIOS INNECESARIOS)
+    private static String depurar(String entrada) {
+    }
 }
+
