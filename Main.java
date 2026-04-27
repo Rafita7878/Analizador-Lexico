@@ -70,94 +70,91 @@ public class Main {
     //  Contiene: encabezado, tabla de símbolos y lista completa de tokens
     // ────────────────────────────────────────────────────────────────────────
     private static String generarArchivoTok(Map<String, String[]> tabla,
-                                             List<Token> tokens,
-                                             List<String> errores) {
-        StringBuilder sb = new StringBuilder();
-        String separador  = "=".repeat(65) + "\n";
-        String divisor    = "-".repeat(65) + "\n";
+                                         List<Token> tokens,
+                                         List<String> errores) {
+    StringBuilder sb = new StringBuilder();
+    String separador = "=".repeat(65) + "\n";
+    String divisor   = "-".repeat(65) + "\n";
 
-        // ── Encabezado del archivo ───────────────────────────────────────────
-        sb.append(separador);
-        sb.append("  ANALIZADOR LÉXICO — LENGUAJE RAFI\n");
-        sb.append("  Archivo: progfte.tok\n");
-        sb.append(separador);
-        sb.append("\n");
+    // ── Encabezado ───────────────────────────────────────────────────────────
+    sb.append(separador);
+    sb.append("  ANALIZADOR LÉXICO — LENGUAJE RAFI\n");
+    sb.append("  Archivo: progfte.tok\n");
+    sb.append(separador);
+    sb.append("\n");
 
-        // ── SECCIÓN 1: Tabla de símbolos ─────────────────────────────────────
-        sb.append(separador);
-        sb.append("  SECCIÓN 1 — TABLA DE SÍMBOLOS\n");
-        sb.append(separador);
-        sb.append(String.format("%-5s | %-20s | %-12s | %-10s | %s%n",
-                                "No.", "VARIABLE", "TIPO", "VALOR INIT", "LÍNEA"));
-        sb.append(divisor);
+    // ── SECCIÓN 1: Tabla de símbolos ─────────────────────────────────────────
+    sb.append(separador);
+    sb.append("  SECCIÓN 1 — TABLA DE SÍMBOLOS\n");
+    sb.append(separador);
+    sb.append(String.format("%-5s | %-20s | %-12s | %-10s | %-6s | %s%n",
+                            "No.", "VARIABLE", "TIPO", "VALOR INIT", "REF", "LÍNEA"));
+    sb.append(divisor);
 
-        if (tabla.isEmpty()) {
-            sb.append("  (No se declararon variables)\n");
-        } else {
-            int contador = 1;
-            for (Map.Entry<String, String[]> entrada : tabla.entrySet()) {
-                String nombre = entrada.getKey();
-                String tipo   = entrada.getValue()[0];
-                String valor  = entrada.getValue()[1];
-                String linea  = entrada.getValue()[2];
-                sb.append(String.format("%-5d | %-20s | %-12s | %-10s | %s%n",
-                                        contador++, nombre, tipo, valor, linea));
-            }
+    if (tabla.isEmpty()) {
+        sb.append("  (No se declararon variables)\n");
+    } else {
+        int contador = 1;
+        for (Map.Entry<String, String[]> entrada : tabla.entrySet()) {
+            String nombre = entrada.getKey();
+            String tipo   = entrada.getValue()[0];
+            String valor  = entrada.getValue()[1];
+            String linea  = entrada.getValue()[2];
+            // Los identificadores siempre tienen ref 300
+            sb.append(String.format("%-5d | %-20s | %-12s | %-10s | %-6d | %s%n",
+                                    contador++, nombre, tipo, valor, 300, linea));
         }
-        sb.append("\n");
-
-        // ── SECCIÓN 2: Lista de tokens clasificados ──────────────────────────
-        sb.append(separador);
-        sb.append("  SECCIÓN 2 — LISTA DE TOKENS\n");
-        sb.append(separador);
-        sb.append(String.format("%-6s | %-22s | %-22s | %s%n",
-                                "LÍNEA", "NOMBRE", "TIPO", "LEXEMA"));
-        sb.append(divisor);
-
-        // Agrupar tokens por categoría para mejor lectura
-        //String categoriaActual = "";
-        for (Token t : tokens) {
-            sb.append(String.format("%-6d | %-22s | %-22s | %s%n",
-                            t.linea, t.nombre, t.tipo, t.lexema));
-        }
-        sb.append("\n");
-
-        // ── SECCIÓN 3: Resumen por categoría ─────────────────────────────────
-        sb.append(separador);
-        sb.append("  SECCIÓN 3 — RESUMEN\n");
-        sb.append(separador);
-
-        // Contar tokens por categoría
-        Map<String, Integer> conteo = new LinkedHashMap<>();
-        for (Token t : tokens) {
-            conteo.put(t.nombre, conteo.getOrDefault(t.nombre, 0) + 1);
-        }
-        for (Map.Entry<String, Integer> entrada : conteo.entrySet()) {
-            sb.append(String.format("  %-25s : %d token(s)%n",
-                                    entrada.getKey(), entrada.getValue()));
-        }
-        sb.append(divisor);
-        sb.append(String.format("  %-25s : %d%n", "TOTAL DE TOKENS",   tokens.size()));
-        sb.append(String.format("  %-25s : %d%n", "TOTAL DE VARIABLES", tabla.size()));
-        sb.append(String.format("  %-25s : %d%n", "TOTAL DE ERRORES",   errores.size()));
-        sb.append("\n");
-
-        // ── SECCIÓN 4: Errores léxicos ───────────────────────────────────────
-        sb.append(separador);
-        sb.append("  SECCIÓN 4 — ERRORES LÉXICOS\n");
-        sb.append(separador);
-        if (errores.isEmpty()) {
-            sb.append("  Sin errores léxicos.\n");
-        } else {
-            for (String error : errores) {
-                sb.append("  " + error + "\n");
-            }
-        }
-        sb.append(separador);
-
-        return sb.toString();
     }
+    sb.append("\n");
 
+    // ── SECCIÓN 2: Lista de lexemas — formato exacto del profe ───────────────
+    sb.append(separador);
+    sb.append("  SECCIÓN 2 — LISTA DE LEXEMAS\n");
+    sb.append(separador);
+    sb.append(String.format("%-10s | %-20s | %-6s | %s%n",
+                            "RENGLÓN", "LEXEMA", "TOKEN", "TIPO"));
+    sb.append(divisor);
+
+    for (Token t : tokens) {
+        sb.append(String.format("Renglón: %-4d | Lexema: %-20s | Token: %-5d | %s%n",
+                                t.linea, t.lexema, t.ref, t.tipo));
+    }
+    sb.append("\n");
+
+    // ── SECCIÓN 3: Resumen por categoría ─────────────────────────────────────
+    sb.append(separador);
+    sb.append("  SECCIÓN 3 — RESUMEN\n");
+    sb.append(separador);
+
+    Map<String, Integer> conteo = new LinkedHashMap<>();
+    for (Token t : tokens) {
+        conteo.put(t.nombre, conteo.getOrDefault(t.nombre, 0) + 1);
+    }
+    for (Map.Entry<String, Integer> entrada : conteo.entrySet()) {
+        sb.append(String.format("  %-25s : %d token(s)%n",
+                                entrada.getKey(), entrada.getValue()));
+    }
+    sb.append(divisor);
+    sb.append(String.format("  %-25s : %d%n", "TOTAL DE TOKENS",    tokens.size()));
+    sb.append(String.format("  %-25s : %d%n", "TOTAL DE VARIABLES", tabla.size()));
+    sb.append(String.format("  %-25s : %d%n", "TOTAL DE ERRORES",   errores.size()));
+    sb.append("\n");
+
+    // ── SECCIÓN 4: Errores léxicos ───────────────────────────────────────────
+    sb.append(separador);
+    sb.append("  SECCIÓN 4 — ERRORES LÉXICOS\n");
+    sb.append(separador);
+    if (errores.isEmpty()) {
+        sb.append("  Sin errores léxicos.\n");
+    } else {
+        for (String error : errores) {
+            sb.append("  " + error + "\n");
+        }
+    }
+    sb.append(separador);
+
+    return sb.toString();
+}
     // ────────────────────────────────────────────────────────────────────────
     //  CONSTRUIR TABLA DE SÍMBOLOS
     // ────────────────────────────────────────────────────────────────────────
@@ -217,18 +214,21 @@ public class Main {
     // ────────────────────────────────────────────────────────────────────────
     private static String generarContenidoTabla(Map<String, String[]> tabla) {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%-5s | %-20s | %-12s | %-10s | %s%n",
-                                "No.", "VARIABLE", "TIPO", "VALOR INIT", "LÍNEA"));
-        sb.append("-".repeat(65) + "\n");
+
+        // Encabezado con columna REF incluida
+        sb.append(String.format("%-5s | %-20s | %-12s | %-10s | %-6s | %s%n",
+                            "No.", "VARIABLE", "TIPO", "VALOR INIT", "REF", "LÍNEA"));
+        sb.append("-".repeat(70) + "\n");
 
         int contador = 1;
         for (Map.Entry<String, String[]> entrada : tabla.entrySet()) {
-            sb.append(String.format("%-5d | %-20s | %-12s | %-10s | %s%n",
-                                    contador++,
-                                    entrada.getKey(),
-                                    entrada.getValue()[0],
-                                    entrada.getValue()[1],
-                                    entrada.getValue()[2]));
+            sb.append(String.format("%-5d | %-20s | %-12s | %-10s | %-6d | %s%n",
+                                contador++,
+                                entrada.getKey(),
+                                entrada.getValue()[0],
+                                entrada.getValue()[1],
+                                300,
+                                entrada.getValue()[2]));
         }
         return sb.toString();
     }

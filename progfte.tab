@@ -1,7 +1,5 @@
-No.   | VARIABLE             | TIPO         | VALOR INIT | LÍNEA
------------------------------------------------------------------
-1     | a                    | entero       | 0          | 4
-2     | b                    | entero       | 0          | 4
-3     | c                    | entero       | 0          | 4
-4     | d                    | cadena       | ""         | 5
-5     | e                    | booleano     | false      | 6
+No.   | VARIABLE             | TIPO         | VALOR INIT | REF    | LÍNEA
+----------------------------------------------------------------------
+1     | a                    | entero       | 0          | 300    | 4
+2     | b                    | entero       | 0          | 300    | 4
+3     | mensaje              | cadena       | ""         | 300    | 5

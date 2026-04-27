@@ -1,25 +1,23 @@
 public class Token {
-    public String nombre;  // palabraReservada, aritmetico o agrupacion
-    public String tipo;    //INICIO , PARENTESIS
-    public String lexema; //inicio, +, (
-    public int linea;
+    public String nombre;  // categoría: PALABRA_RESERVADA, ARITMETICO, AGRUPACION, etc.
+    public String tipo;    // token específico: INICIO, SUMA, PARENTESIS_ABIERTO, etc.
+    public String lexema;  // texto original: inicio, +, (
+    public int    linea;   // número de línea en el archivo fuente
+    public int    ref;     // número de referencia del token
 
-    //constructor del token
-    public Token(String nombre, String tipo, String lexema, int linea) {
+    // Constructor del token
+    public Token(String nombre, String tipo, String lexema, int linea, int ref) {
         this.nombre = nombre;
-        this.tipo = tipo;
+        this.tipo   = tipo;
         this.lexema = lexema;
-        this.linea = linea;
+        this.linea  = linea;
+        this.ref    = ref;
     }
-    
-    //formato que retorna los valores del token
+
+    // Formato para mostrar en consola y en el archivo .tok
     @Override
     public String toString() {
-        return "Token{" +
-                "nombre='" + nombre + '\'' +
-                ", tipo='" + tipo + '\'' +
-                ", lexema='" + lexema + '\'' +
-                ", linea=" + linea +
-                '}';
+        return String.format("Renglón: %d, Lexema: %-15s Token: %-5d %s",
+                             linea, lexema, ref, tipo);
     }
 }

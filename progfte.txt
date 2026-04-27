@@ -1,20 +1,17 @@
-rafi MiPrograma /* Encabezado del programa */
+rafi PruerbaErrores
 
 decl
-  entero a, b, c;
-  cadena d;
-  booleano e;
+  entero a, b;
+  cadena mensaje;
 
 inicio
   a := 5;
-  b := 3;
-  impcad("Hola mundo");
+  b := a + 2;
+  mensaje := "Hola";
+  impcad(mensaje);
+  a := a @ b;
+  b := b # 3;
+  impcad("valor: " $ mensaje);
   leerdig(a);
-  d := a * (b - c);
-  si (a + b) entonces
-    impdig(a);
-  fin
-  mientras (b) hacer
-    b := b - 1;
-  fin
+  a := a + b;
 fin

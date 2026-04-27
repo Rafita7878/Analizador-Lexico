@@ -2,7 +2,7 @@ import java.util.*;
 
 public class AnalizadorLexico {
 
-    // ── Palabras reservadas del lenguaje 
+    // ── Palabras reservadas del lenguaje Rafi ────────────────────────────────
     private static final Map<String, String> RESERVADAS = new LinkedHashMap<>();
     static {
         RESERVADAS.put("rafi",       "PROG");
@@ -23,7 +23,7 @@ public class AnalizadorLexico {
         RESERVADAS.put("leercad",    "LEERCAD");
     }
 
-    //Operadores aritméticos
+    // ── Operadores aritméticos ───────────────────────────────────────────────
     private static final Map<Character, String> ARITMETICOS = new LinkedHashMap<>();
     static {
         ARITMETICOS.put('+', "SUMA");
@@ -32,7 +32,7 @@ public class AnalizadorLexico {
         ARITMETICOS.put('/', "DIVISION");
     }
 
-    // Símbolos de agrupación
+    // ── Símbolos de agrupación ───────────────────────────────────────────────
     private static final Map<Character, String> AGRUPACION = new LinkedHashMap<>();
     static {
         AGRUPACION.put('(', "PARENTESIS_ABIERTO");
@@ -43,10 +43,57 @@ public class AnalizadorLexico {
         AGRUPACION.put(']', "CORCHETE_CERRADO");
     }
 
-    //  Lista de errores léxicos encontrados 
+    // ── Números de referencia para cada tipo de token ────────────────────────
+    private static final Map<String, Integer> REF_TOKEN = new LinkedHashMap<>();
+    static {
+        // Palabras reservadas
+        REF_TOKEN.put("PROG",               100);
+        REF_TOKEN.put("DECL",               101);
+        REF_TOKEN.put("TIPO",               102);
+        REF_TOKEN.put("INICIO",             103);
+        REF_TOKEN.put("FIN",                104);
+        REF_TOKEN.put("SI",                 105);
+        REF_TOKEN.put("ENTONCES",           106);
+        REF_TOKEN.put("SINO",               107);
+        REF_TOKEN.put("MIENTRAS",           108);
+        REF_TOKEN.put("HACER",              109);
+        REF_TOKEN.put("IMPDIG",             110);
+        REF_TOKEN.put("IMPCAD",             111);
+        REF_TOKEN.put("LEERDIG",            112);
+        REF_TOKEN.put("LEERCAD",            113);
+        // Identificadores y constantes
+        REF_TOKEN.put("ID",                 300);
+        REF_TOKEN.put("CENT",               400);
+        REF_TOKEN.put("CLIT",               500);
+        // Aritméticos
+        REF_TOKEN.put("SUMA",                10);
+        REF_TOKEN.put("RESTA",               11);
+        REF_TOKEN.put("MULTIPLICACION",      12);
+        REF_TOKEN.put("DIVISION",            13);
+        // Agrupación
+        REF_TOKEN.put("PARENTESIS_ABIERTO",  75);
+        REF_TOKEN.put("PARENTESIS_CERRADO",  76);
+        REF_TOKEN.put("LLAVE_ABIERTA",       79);
+        REF_TOKEN.put("LLAVE_CERRADA",       80);
+        REF_TOKEN.put("CORCHETE_ABIERTO",    81);
+        REF_TOKEN.put("CORCHETE_CERRADO",    82);
+        // Puntuación y asignación
+        REF_TOKEN.put("PC",                  92);
+        REF_TOKEN.put("COMA",                91);
+        REF_TOKEN.put("ASIG",                90);
+    }
+
+    // Devuelve el número de referencia de un tipo de token
+    public int getRef(String tipo) {
+        return REF_TOKEN.getOrDefault(tipo, -1);
+    }
+
+    // ── Lista de errores léxicos encontrados ────────────────────────────────
     private final List<String> errores = new ArrayList<>();
 
+    // ────────────────────────────────────────────────────────────────────────
     //  MÉTODO PRINCIPAL: recibe el código fuente y devuelve la lista de tokens
+    // ────────────────────────────────────────────────────────────────────────
     public List<Token> analizar(String entrada) {
         List<Token> tokens = new ArrayList<>();
         int i     = 0;
@@ -55,14 +102,14 @@ public class AnalizadorLexico {
         while (i < entrada.length()) {
             char c = entrada.charAt(i);
 
-            // 1. Salto de línea
+            // 1. Salto de línea → contar línea
             if (c == '\n') {
                 linea++;
                 i++;
                 continue;
             }
 
-            // 2. Espacios, tabuladores y retorno de carro -> ignorar
+            // 2. Espacios, tabuladores y retorno de carro → ignorar
             if (c == ' ' || c == '\t' || c == '\r') {
                 i++;
                 continue;
@@ -82,9 +129,10 @@ public class AnalizadorLexico {
                 continue;
             }
 
-            // 4. Operador de asignación := 
+            // 4. Operador de asignación := (símbolo doble, requiere lookahead)
             if (c == ':' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '=') {
-                tokens.add(new Token("ASIGNACION", "ASIG", ":=", linea));
+                tokens.add(new Token("ASIGNACION", "ASIG", ":=", linea,
+                                     getRef("ASIG")));
                 i += 2;
                 continue;
             }
@@ -100,9 +148,12 @@ public class AnalizadorLexico {
                 }
                 String palabra = lexema.toString();
                 if (RESERVADAS.containsKey(palabra)) {
-                    tokens.add(new Token("PALABRA_RESERVADA", RESERVADAS.get(palabra), palabra, lineaInicio));
+                    String tipo = RESERVADAS.get(palabra);
+                    tokens.add(new Token("PALABRA_RESERVADA", tipo, palabra, lineaInicio,
+                                         getRef(tipo)));
                 } else {
-                    tokens.add(new Token("IDENTIFICADOR", "ID", palabra, lineaInicio));
+                    tokens.add(new Token("IDENTIFICADOR", "ID", palabra, lineaInicio,
+                                         getRef("ID")));
                 }
                 continue;
             }
@@ -115,7 +166,8 @@ public class AnalizadorLexico {
                     lexema.append(entrada.charAt(i));
                     i++;
                 }
-                tokens.add(new Token("CONSTANTE_ENTERA", "CENT", lexema.toString(), lineaInicio));
+                tokens.add(new Token("CONSTANTE_ENTERA", "CENT", lexema.toString(), lineaInicio,
+                                     getRef("CENT")));
                 continue;
             }
 
@@ -123,48 +175,55 @@ public class AnalizadorLexico {
             if (c == '"') {
                 StringBuilder lexema = new StringBuilder();
                 int lineaInicio = linea;
-                i++; // saltar la comilla de apertura
+                i++; // saltar comilla de apertura
                 while (i < entrada.length() && entrada.charAt(i) != '"') {
                     if (entrada.charAt(i) == '\n') linea++;
                     lexema.append(entrada.charAt(i));
                     i++;
                 }
-                i++; // saltar la comilla de cierre
-                tokens.add(new Token("CADENA_LITERAL", "CLIT", "\"" + lexema + "\"", lineaInicio));
+                i++; // saltar comilla de cierre
+                tokens.add(new Token("CADENA_LITERAL", "CLIT", "\"" + lexema + "\"", lineaInicio,
+                                     getRef("CLIT")));
                 continue;
             }
 
             // 8. Operadores aritméticos
             if (ARITMETICOS.containsKey(c)) {
-                tokens.add(new Token("ARITMETICO", ARITMETICOS.get(c), String.valueOf(c), linea));
+                String tipo = ARITMETICOS.get(c);
+                tokens.add(new Token("ARITMETICO", tipo, String.valueOf(c), linea,
+                                     getRef(tipo)));
                 i++;
                 continue;
             }
 
             // 9. Símbolos de agrupación
             if (AGRUPACION.containsKey(c)) {
-                tokens.add(new Token("AGRUPACION", AGRUPACION.get(c), String.valueOf(c), linea));
+                String tipo = AGRUPACION.get(c);
+                tokens.add(new Token("AGRUPACION", tipo, String.valueOf(c), linea,
+                                     getRef(tipo)));
                 i++;
                 continue;
             }
 
-            // 10. Punto y coma (delimitador de sentencias)
+            // 10. Punto y coma
             if (c == ';') {
-                tokens.add(new Token("PUNTUACION", "PC", ";", linea));
+                tokens.add(new Token("PUNTUACION", "PC", ";", linea,
+                                     getRef("PC")));
                 i++;
                 continue;
             }
 
-            // 11. Coma (separador de variables en declaraciones)
+            // 11. Coma
             if (c == ',') {
-                tokens.add(new Token("PUNTUACION", "COMA", ",", linea));
+                tokens.add(new Token("PUNTUACION", "COMA", ",", linea,
+                                     getRef("COMA")));
                 i++;
                 continue;
             }
 
             // 12. Carácter no reconocido → error léxico con número de línea
-            errores.add("ERROR LÉXICO en línea " + linea +
-                        ": carácter no reconocido '" + c + "'");
+            errores.add("Renglón: " + linea +
+                        ", Símbolo no identificado '" + c + "' (posible error léxico)");
             i++;
         }
 
