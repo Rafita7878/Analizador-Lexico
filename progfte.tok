@@ -3,98 +3,70 @@
   Archivo: progfte.tok
 =================================================================
 
-=================================================================
-  SECCIÓN 1 — TABLA DE SÍMBOLOS
-=================================================================
-No.   | VARIABLE             | TIPO         | VALOR INIT | REF    | LÍNEA
+ NUM   | TOKEN                  | LEXEMA               | REFERENCIA | LINEA
 -----------------------------------------------------------------
-1     | a                    | entero       | 0          | 300    | 4
-2     | b                    | entero       | 0          | 300    | 4
-3     | mensaje              | cadena       | ""         | 300    | 5
+ 1     | PROG                   | rafi                 | 100        | 1
+ 2     | ID                     | PruerbaErrores       | 300        | 1
+ 3     | DECL                   | decl                 | 101        | 3
+ 4     | TIPO                   | entero               | 102        | 4
+ 5     | ID                     | a                    | 300        | 4
+ 6     | COMA                   | ,                    | 91         | 4
+ 7     | ID                     | b                    | 300        | 4
+ 8     | PC                     | ;                    | 92         | 4
+ 9     | TIPO                   | cadena               | 102        | 5
+ 10    | ID                     | mensaje              | 300        | 5
+ 11    | PC                     | ;                    | 92         | 5
+ 12    | INICIO                 | inicio               | 103        | 7
+ 13    | ID                     | a                    | 300        | 8
+ 14    | ASIG                   | :=                   | 90         | 8
+ 15    | CENT                   | 5                    | 400        | 8
+ 16    | PC                     | ;                    | 92         | 8
+ 17    | ID                     | b                    | 300        | 9
+ 18    | ASIG                   | :=                   | 90         | 9
+ 19    | ID                     | a                    | 300        | 9
+ 20    | SUMA                   | +                    | 10         | 9
+ 21    | CENT                   | 2                    | 400        | 9
+ 22    | PC                     | ;                    | 92         | 9
+ 23    | ID                     | mensaje              | 300        | 10
+ 24    | ASIG                   | :=                   | 90         | 10
+ 25    | CLIT                   | "Hola"               | 500        | 10
+ 26    | PC                     | ;                    | 92         | 10
+ 27    | IMPCAD                 | impcad               | 111        | 11
+ 28    | PARENTESIS_ABIERTO     | (                    | 75         | 11
+ 29    | ID                     | mensaje              | 300        | 11
+ 30    | PARENTESIS_CERRADO     | )                    | 76         | 11
+ 31    | PC                     | ;                    | 92         | 11
+ 32    | ID                     | a                    | 300        | 12
+ 33    | ASIG                   | :=                   | 90         | 12
+ 34    | ID                     | a                    | 300        | 12
+ 35    | ID                     | b                    | 300        | 12
+ 36    | PC                     | ;                    | 92         | 12
+ 37    | ID                     | b                    | 300        | 13
+ 38    | ASIG                   | :=                   | 90         | 13
+ 39    | ID                     | b                    | 300        | 13
+ 40    | CENT                   | 3                    | 400        | 13
+ 41    | PC                     | ;                    | 92         | 13
+ 42    | IMPCAD                 | impcad               | 111        | 14
+ 43    | PARENTESIS_ABIERTO     | (                    | 75         | 14
+ 44    | CLIT                   | "valor: "            | 500        | 14
+ 45    | ID                     | mensaje              | 300        | 14
+ 46    | PARENTESIS_CERRADO     | )                    | 76         | 14
+ 47    | PC                     | ;                    | 92         | 14
+ 48    | LEERDIG                | leerdig              | 112        | 15
+ 49    | PARENTESIS_ABIERTO     | (                    | 75         | 15
+ 50    | ID                     | a                    | 300        | 15
+ 51    | PARENTESIS_CERRADO     | )                    | 76         | 15
+ 52    | PC                     | ;                    | 92         | 15
+ 53    | ID                     | a                    | 300        | 16
+ 54    | ASIG                   | :=                   | 90         | 16
+ 55    | ID                     | a                    | 300        | 16
+ 56    | SUMA                   | +                    | 10         | 16
+ 57    | ID                     | b                    | 300        | 16
+ 58    | PC                     | ;                    | 92         | 16
+ 59    | FIN                    | fin                  | 104        | 17
 
 =================================================================
-  SECCIÓN 2 — LISTA DE LEXEMAS
-=================================================================
-RENGLÓN    | LEXEMA               | TOKEN  | TIPO
------------------------------------------------------------------
-Renglón: 1    | Lexema: rafi                 | Token: 100   | PROG
-Renglón: 1    | Lexema: PruerbaErrores       | Token: 300   | ID
-Renglón: 3    | Lexema: decl                 | Token: 101   | DECL
-Renglón: 4    | Lexema: entero               | Token: 102   | TIPO
-Renglón: 4    | Lexema: a                    | Token: 300   | ID
-Renglón: 4    | Lexema: ,                    | Token: 91    | COMA
-Renglón: 4    | Lexema: b                    | Token: 300   | ID
-Renglón: 4    | Lexema: ;                    | Token: 92    | PC
-Renglón: 5    | Lexema: cadena               | Token: 102   | TIPO
-Renglón: 5    | Lexema: mensaje              | Token: 300   | ID
-Renglón: 5    | Lexema: ;                    | Token: 92    | PC
-Renglón: 7    | Lexema: inicio               | Token: 103   | INICIO
-Renglón: 8    | Lexema: a                    | Token: 300   | ID
-Renglón: 8    | Lexema: :=                   | Token: 90    | ASIG
-Renglón: 8    | Lexema: 5                    | Token: 400   | CENT
-Renglón: 8    | Lexema: ;                    | Token: 92    | PC
-Renglón: 9    | Lexema: b                    | Token: 300   | ID
-Renglón: 9    | Lexema: :=                   | Token: 90    | ASIG
-Renglón: 9    | Lexema: a                    | Token: 300   | ID
-Renglón: 9    | Lexema: +                    | Token: 10    | SUMA
-Renglón: 9    | Lexema: 2                    | Token: 400   | CENT
-Renglón: 9    | Lexema: ;                    | Token: 92    | PC
-Renglón: 10   | Lexema: mensaje              | Token: 300   | ID
-Renglón: 10   | Lexema: :=                   | Token: 90    | ASIG
-Renglón: 10   | Lexema: "Hola"               | Token: 500   | CLIT
-Renglón: 10   | Lexema: ;                    | Token: 92    | PC
-Renglón: 11   | Lexema: impcad               | Token: 111   | IMPCAD
-Renglón: 11   | Lexema: (                    | Token: 75    | PARENTESIS_ABIERTO
-Renglón: 11   | Lexema: mensaje              | Token: 300   | ID
-Renglón: 11   | Lexema: )                    | Token: 76    | PARENTESIS_CERRADO
-Renglón: 11   | Lexema: ;                    | Token: 92    | PC
-Renglón: 12   | Lexema: a                    | Token: 300   | ID
-Renglón: 12   | Lexema: :=                   | Token: 90    | ASIG
-Renglón: 12   | Lexema: a                    | Token: 300   | ID
-Renglón: 12   | Lexema: b                    | Token: 300   | ID
-Renglón: 12   | Lexema: ;                    | Token: 92    | PC
-Renglón: 13   | Lexema: b                    | Token: 300   | ID
-Renglón: 13   | Lexema: :=                   | Token: 90    | ASIG
-Renglón: 13   | Lexema: b                    | Token: 300   | ID
-Renglón: 13   | Lexema: 3                    | Token: 400   | CENT
-Renglón: 13   | Lexema: ;                    | Token: 92    | PC
-Renglón: 14   | Lexema: impcad               | Token: 111   | IMPCAD
-Renglón: 14   | Lexema: (                    | Token: 75    | PARENTESIS_ABIERTO
-Renglón: 14   | Lexema: "valor: "            | Token: 500   | CLIT
-Renglón: 14   | Lexema: mensaje              | Token: 300   | ID
-Renglón: 14   | Lexema: )                    | Token: 76    | PARENTESIS_CERRADO
-Renglón: 14   | Lexema: ;                    | Token: 92    | PC
-Renglón: 15   | Lexema: leerdig              | Token: 112   | LEERDIG
-Renglón: 15   | Lexema: (                    | Token: 75    | PARENTESIS_ABIERTO
-Renglón: 15   | Lexema: a                    | Token: 300   | ID
-Renglón: 15   | Lexema: )                    | Token: 76    | PARENTESIS_CERRADO
-Renglón: 15   | Lexema: ;                    | Token: 92    | PC
-Renglón: 16   | Lexema: a                    | Token: 300   | ID
-Renglón: 16   | Lexema: :=                   | Token: 90    | ASIG
-Renglón: 16   | Lexema: a                    | Token: 300   | ID
-Renglón: 16   | Lexema: +                    | Token: 10    | SUMA
-Renglón: 16   | Lexema: b                    | Token: 300   | ID
-Renglón: 16   | Lexema: ;                    | Token: 92    | PC
-Renglón: 17   | Lexema: fin                  | Token: 104   | FIN
-
-=================================================================
-  SECCIÓN 3 — RESUMEN
-=================================================================
-  PALABRA_RESERVADA         : 9 token(s)
-  IDENTIFICADOR             : 19 token(s)
-  PUNTUACION                : 12 token(s)
-  ASIGNACION                : 6 token(s)
-  CONSTANTE_ENTERA          : 3 token(s)
-  ARITMETICO                : 2 token(s)
-  CADENA_LITERAL            : 2 token(s)
-  AGRUPACION                : 6 token(s)
------------------------------------------------------------------
-  TOTAL DE TOKENS           : 59
-  TOTAL DE VARIABLES        : 3
-  TOTAL DE ERRORES          : 3
-
-=================================================================
-  SECCIÓN 4 — ERRORES LÉXICOS
+  ERRORES LÉXICOS
 =================================================================
   Renglón: 12, Símbolo no identificado '@' (posible error léxico)
   Renglón: 13, Símbolo no identificado '#' (posible error léxico)

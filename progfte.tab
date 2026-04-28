@@ -1,4 +1,4 @@
-No.   | VARIABLE             | TIPO         | VALOR INIT | REF    | LÍNEA
+No.   | VARIABLE             | TIPO         | VALOR INIT | REF    | LINEA
 ----------------------------------------------------------------------
 1     | a                    | entero       | 0          | 300    | 4
 2     | b                    | entero       | 0          | 300    | 4

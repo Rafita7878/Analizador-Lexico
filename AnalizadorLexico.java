@@ -3,6 +3,7 @@ import java.util.*;
 public class AnalizadorLexico {
 
     // ── Palabras reservadas del lenguaje Rafi ────────────────────────────────
+    // El mapa asocia cada palabra reservada con su tipo de token (ej. "PROG", "DECL", etc.)
     private static final Map<String, String> RESERVADAS = new LinkedHashMap<>();
     static {
         RESERVADAS.put("rafi",       "PROG");
@@ -24,6 +25,7 @@ public class AnalizadorLexico {
     }
 
     // ── Operadores aritméticos ───────────────────────────────────────────────
+    // El mapa asocia cada símbolo aritmético con su tipo de token (ej. "SUMA", "RESTA", etc.)
     private static final Map<Character, String> ARITMETICOS = new LinkedHashMap<>();
     static {
         ARITMETICOS.put('+', "SUMA");
@@ -33,6 +35,7 @@ public class AnalizadorLexico {
     }
 
     // ── Símbolos de agrupación ───────────────────────────────────────────────
+    // El mapa asocia cada símbolo de agrupación con su tipo de token (ej. "PARENTESIS_ABIERTO", "PARENTESIS_CERRADO", etc.)
     private static final Map<Character, String> AGRUPACION = new LinkedHashMap<>();
     static {
         AGRUPACION.put('(', "PARENTESIS_ABIERTO");
@@ -44,6 +47,7 @@ public class AnalizadorLexico {
     }
 
     // ── Números de referencia para cada tipo de token ────────────────────────
+    // El mapa asocia cada tipo de token con su número de referencia (ej. "PROG" → 100, "ID" → 300, etc.)
     private static final Map<String, Integer> REF_TOKEN = new LinkedHashMap<>();
     static {
         // Palabras reservadas
@@ -102,7 +106,7 @@ public class AnalizadorLexico {
         while (i < entrada.length()) {
             char c = entrada.charAt(i);
 
-            // 1. Salto de línea → contar línea
+            // 1. Salto de línea → el contador de lineas aumenta y se ignora el carácter
             if (c == '\n') {
                 linea++;
                 i++;
@@ -141,12 +145,14 @@ public class AnalizadorLexico {
             if (Character.isLetter(c)) {
                 StringBuilder lexema = new StringBuilder();
                 int lineaInicio = linea;
+                //construye la palabra completa (letras, dígitos o guiones bajos)
                 while (i < entrada.length() &&
                        (Character.isLetterOrDigit(entrada.charAt(i)) || entrada.charAt(i) == '_')) {
                     lexema.append(entrada.charAt(i));
                     i++;
                 }
                 String palabra = lexema.toString();
+                //verifica si es reservada o identificador
                 if (RESERVADAS.containsKey(palabra)) {
                     String tipo = RESERVADAS.get(palabra);
                     tokens.add(new Token("PALABRA_RESERVADA", tipo, palabra, lineaInicio,
