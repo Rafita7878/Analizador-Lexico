@@ -6,69 +6,35 @@
  NUM   | TOKEN                  | LEXEMA               | REFERENCIA | LINEA
 -----------------------------------------------------------------
  1     | PROG                   | rafi                 | 100        | 1
- 2     | ID                     | PruerbaErrores       | 300        | 1
+ 2     | ID                     | PruebaErrores        | 300        | 1
  3     | DECL                   | decl                 | 101        | 3
  4     | TIPO                   | entero               | 102        | 4
  5     | ID                     | a                    | 300        | 4
  6     | COMA                   | ,                    | 91         | 4
  7     | ID                     | b                    | 300        | 4
  8     | PC                     | ;                    | 92         | 4
- 9     | TIPO                   | cadena               | 102        | 5
- 10    | ID                     | mensaje              | 300        | 5
- 11    | PC                     | ;                    | 92         | 5
- 12    | INICIO                 | inicio               | 103        | 7
- 13    | ID                     | a                    | 300        | 8
- 14    | ASIG                   | :=                   | 90         | 8
- 15    | CENT                   | 5                    | 400        | 8
- 16    | PC                     | ;                    | 92         | 8
- 17    | ID                     | b                    | 300        | 9
- 18    | ASIG                   | :=                   | 90         | 9
- 19    | ID                     | a                    | 300        | 9
- 20    | SUMA                   | +                    | 10         | 9
- 21    | CENT                   | 2                    | 400        | 9
- 22    | PC                     | ;                    | 92         | 9
- 23    | ID                     | mensaje              | 300        | 10
- 24    | ASIG                   | :=                   | 90         | 10
- 25    | CLIT                   | "Hola"               | 500        | 10
+ 9     | INICIO                 | inicio               | 103        | 6
+ 10    | ID                     | a                    | 300        | 7
+ 11    | ASIG                   | :=                   | 90         | 7
+ 12    | CENT                   | 5                    | 400        | 7
+ 13    | PC                     | ;                    | 92         | 7
+ 14    | ID                     | b                    | 300        | 8
+ 15    | ASIG                   | :=                   | 90         | 8
+ 16    | CENT                   | 2                    | 400        | 8
+ 17    | PC                     | ;                    | 92         | 8
+ 18    | MIENTRAS               | mientras             | 108        | 9
+ 19    | PARENTESIS_ABIERTO     | (                    | 75         | 9
+ 20    | ID                     | a                    | 300        | 9
+ 21    | SUMA                   | +                    | 10         | 9
+ 22    | ID                     | b                    | 300        | 9
+ 23    | PARENTESIS_CERRADO     | )                    | 76         | 9
+ 24    | HACER                  | hacer                | 109        | 9
+ 25    | ID                     | ab                   | 300        | 10
  26    | PC                     | ;                    | 92         | 10
- 27    | IMPCAD                 | impcad               | 111        | 11
- 28    | PARENTESIS_ABIERTO     | (                    | 75         | 11
- 29    | ID                     | mensaje              | 300        | 11
- 30    | PARENTESIS_CERRADO     | )                    | 76         | 11
- 31    | PC                     | ;                    | 92         | 11
- 32    | ID                     | a                    | 300        | 12
- 33    | ASIG                   | :=                   | 90         | 12
- 34    | ID                     | a                    | 300        | 12
- 35    | ID                     | b                    | 300        | 12
- 36    | PC                     | ;                    | 92         | 12
- 37    | ID                     | b                    | 300        | 13
- 38    | ASIG                   | :=                   | 90         | 13
- 39    | ID                     | b                    | 300        | 13
- 40    | CENT                   | 3                    | 400        | 13
- 41    | PC                     | ;                    | 92         | 13
- 42    | IMPCAD                 | impcad               | 111        | 14
- 43    | PARENTESIS_ABIERTO     | (                    | 75         | 14
- 44    | CLIT                   | "valor: "            | 500        | 14
- 45    | ID                     | mensaje              | 300        | 14
- 46    | PARENTESIS_CERRADO     | )                    | 76         | 14
- 47    | PC                     | ;                    | 92         | 14
- 48    | LEERDIG                | leerdig              | 112        | 15
- 49    | PARENTESIS_ABIERTO     | (                    | 75         | 15
- 50    | ID                     | a                    | 300        | 15
- 51    | PARENTESIS_CERRADO     | )                    | 76         | 15
- 52    | PC                     | ;                    | 92         | 15
- 53    | ID                     | a                    | 300        | 16
- 54    | ASIG                   | :=                   | 90         | 16
- 55    | ID                     | a                    | 300        | 16
- 56    | SUMA                   | +                    | 10         | 16
- 57    | ID                     | b                    | 300        | 16
- 58    | PC                     | ;                    | 92         | 16
- 59    | FIN                    | fin                  | 104        | 17
+ 27    | FIN                    | fin                  | 104        | 11
 
 =================================================================
   ERRORES LÉXICOS
 =================================================================
-  Renglón: 12, Símbolo no identificado '@' (posible error léxico)
-  Renglón: 13, Símbolo no identificado '#' (posible error léxico)
-  Renglón: 14, Símbolo no identificado '$' (posible error léxico)
+  Sin errores léxicos.
 =================================================================

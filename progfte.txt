@@ -1,17 +1,11 @@
-rafi PruerbaErrores
-
+rafi PruebaErrores
+/*comentario*/
 decl
   entero a, b;
-  cadena mensaje;
 
 inicio
   a := 5;
-  b := a + 2;
-  mensaje := "Hola";
-  impcad(mensaje);
-  a := a @ b;
-  b := b # 3;
-  impcad("valor: " $ mensaje);
-  leerdig(a);
-  a := a + b;
+  b := 2;
+  mientras (a + b) hacer 
+    ab;
 fin

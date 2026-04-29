@@ -267,74 +267,66 @@ public class Main {
         }
     }
 
-    //  MÉTODO DEPURADOR
-    /*
-     * Recorre el código fuente carácter a carácter y construye una versión
-     * limpia eliminando todo lo que no forma parte de la lógica del programa.
-     * Reglas de depuración aplicadas:
-     *   Comentarios /* ... *\/  → se eliminan completamente sin dejar rastro
-     *   Tabuladores \t          → se reemplazan por un espacio simple
-     *   Retornos de carro \r    → se eliminan
-     *   Espacios múltiples      → se reducen a un solo espacio
-     *   Líneas vacías           → se eliminan, no se genera salto de línea
-     */
-    private static String depurar(String entrada) {
-        StringBuilder resultado = new StringBuilder();
-        int i = 0;
+   //  MÉTODO DEPURADOR
+/*
+ * Recorre el código fuente carácter a carácter y construye una versión
+ * limpia en UNA SOLA LÍNEA, eliminando todo lo que no forma parte
+ * de la lógica del programa.
+ * Reglas de depuración aplicadas:
+ *   Comentarios /* ... *\/  → se eliminan completamente sin dejar rastro
+ *   Saltos de línea \n      → se reemplazan por un espacio simple
+ *   Tabuladores \t          → se reemplazan por un espacio simple
+ *   Retornos de carro \r    → se eliminan
+ *   Espacios múltiples      → se reducen a un solo espacio
+ */
+private static String depurar(String entrada) {
+    StringBuilder resultado = new StringBuilder();
+    int i = 0;
 
-        while (i < entrada.length()) {
-            char c = entrada.charAt(i);
-            //detectar el inicio de un comentario y saltar todo su contenido hasta el cierre del mismo
-            if (c == '/' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '*') {
-                i += 2;
-                while (i + 1 < entrada.length()) {
-                    if (entrada.charAt(i) == '*' && entrada.charAt(i + 1) == '/') {
-                        i += 2;
-                        break;
-                    }
-                    i++;
-                }
-                continue;
-            }
+    while (i < entrada.length()) {
+        char c = entrada.charAt(i);
 
-            //salto de linea donde solo se conserva si la linea actual tiene contenido
-            //esto elimina las lineas vacias del archivo depurado.
-            if (c == '\n') {
-                String lineaActual = resultado.toString();
-                int ultimoSalto    = lineaActual.lastIndexOf('\n');
-                String ultimaLinea = (ultimoSalto == -1)
-                        ? lineaActual.trim()
-                        : lineaActual.substring(ultimoSalto + 1).trim();
-                if (!ultimaLinea.isEmpty()) {
-                    resultado.append('\n');
+        // Detectar inicio de comentario /* → saltar todo hasta */
+        if (c == '/' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '*') {
+            i += 2; // saltar /*
+            while (i + 1 < entrada.length()) {
+                if (entrada.charAt(i) == '*' && entrada.charAt(i + 1) == '/') {
+                    i += 2; // saltar */
+                    break;
                 }
                 i++;
-                continue;
             }
-
-            //tabulador -> reemmplaza por un espacio simple para mantener la legibilidad del codigo
-            if (c == '\t' || c == '\r') {
-                if (c == '\t') resultado.append(' ');
-                i++;
-                continue;
-            }
-
-            // Espacio → solo agregar si el carácter anterior no era ya un espacio
-            // Esto colapsa múltiples espacios consecutivos en uno solo
-            if (c == ' ') {
-                if (resultado.length() > 0 &&
-                    resultado.charAt(resultado.length() - 1) != ' ' &&
-                    resultado.charAt(resultado.length() - 1) != '\n') {
-                    resultado.append(' ');
-                }
-                i++;
-                continue;
-            }
-            // Cualquier otro carácter se copia tal cual al resultado depurado
-            resultado.append(c);
-            i++;
+            continue;
         }
-        // trim() elimina espacios o saltos residuales al inicio y al final del resultado
-        return resultado.toString().trim();
+
+        // Saltos de línea, tabuladores y retornos de carro →
+        // se reemplazan por un espacio simple para mantener separación entre palabras
+        if (c == '\n' || c == '\t' || c == '\r') {
+            // Solo agregar espacio si el último carácter no era ya un espacio
+            if (resultado.length() > 0 &&
+                resultado.charAt(resultado.length() - 1) != ' ') {
+                resultado.append(' ');
+            }
+            i++;
+            continue;
+        }
+
+        // Espacios múltiples consecutivos → reducir a uno solo
+        if (c == ' ') {
+            if (resultado.length() > 0 &&
+                resultado.charAt(resultado.length() - 1) != ' ') {
+                resultado.append(' ');
+            }
+            i++;
+            continue;
+        }
+
+        // Cualquier otro carácter se copia tal cual
+        resultado.append(c);
+        i++;
+    }
+
+    // trim() elimina cualquier espacio residual al inicio y al final
+    return resultado.toString().trim();
     }
 }
