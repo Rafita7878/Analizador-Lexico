@@ -22,19 +22,26 @@
  15    | ASIG                   | :=                   | 90         | 8
  16    | CENT                   | 2                    | 400        | 8
  17    | PC                     | ;                    | 92         | 8
- 18    | MIENTRAS               | mientras             | 108        | 9
+ 18    | ID_INVALIDO            | imp@cad              | -1         | 9
  19    | PARENTESIS_ABIERTO     | (                    | 75         | 9
- 20    | ID                     | a                    | 300        | 9
- 21    | SUMA                   | +                    | 10         | 9
- 22    | ID                     | b                    | 300        | 9
- 23    | PARENTESIS_CERRADO     | )                    | 76         | 9
- 24    | HACER                  | hacer                | 109        | 9
- 25    | ID                     | ab                   | 300        | 10
- 26    | PC                     | ;                    | 92         | 10
- 27    | FIN                    | fin                  | 104        | 11
+ 20    | CLIT                   | "Hola"               | 500        | 9
+ 21    | PARENTESIS_CERRADO     | )                    | 76         | 9
+ 22    | PC                     | ;                    | 92         | 9
+ 23    | MIENTRAS               | mientras             | 108        | 10
+ 24    | PARENTESIS_ABIERTO     | (                    | 75         | 10
+ 25    | ID                     | a                    | 300        | 10
+ 26    | SUMA                   | +                    | 10         | 10
+ 27    | ID                     | b                    | 300        | 10
+ 28    | PARENTESIS_CERRADO     | )                    | 76         | 10
+ 29    | HACER                  | hacer                | 109        | 10
+ 30    | ID                     | a                    | 300        | 11
+ 31    | SUMA                   | +                    | 10         | 11
+ 32    | ID                     | b                    | 300        | 11
+ 33    | PC                     | ;                    | 92         | 11
+ 34    | FIN                    | fin                  | 104        | 13
 
 =================================================================
   ERRORES LÉXICOS
 =================================================================
-  Sin errores léxicos.
+  Renglón: 9, Identificador inválido 'imp@cad' contiene símbolo(s) no permitido(s)
 =================================================================
