@@ -1,0 +1,51 @@
+<PROGRAMA>
+  [PROG: rafi]
+  [ID: PruebaErrores]
+  <DECLARACIONES>
+    [DECL: decl]
+  [INICIO: ent]
+  <SENTENCIAS>
+    <ASIGNACION>
+      [ID: ent]
+      [ASIG: :=]
+      <EXPRESION>
+        <TERMINO>
+          [ID: a]
+      [PC: ;]
+    <ASIGNACION>
+      [ID: b]
+      [ASIG: :=]
+      [PC: ;]
+    <ASIGNACION>
+      [ID: a]
+      [ASIG: :=]
+      <EXPRESION>
+        <TERMINO>
+          [CENT: 5]
+      [PC: ;]
+    <ASIGNACION>
+      [ID: b]
+      [ASIG: :=]
+      <EXPRESION>
+        <TERMINO>
+          [CENT: 2]
+      [PC: ;]
+    <CICLO>
+      [MIENTRAS: mientras]
+      <EXPRESION>
+        <TERMINO>
+          [ID: a]
+        [OPERADOR: +]
+        <TERMINO>
+          [ID: b]
+      [HACER: hacer]
+      <SENTENCIAS_CICLO>
+        <ASIGNACION>
+          [ID: a]
+          [ASIG: :=]
+          <EXPRESION>
+            <TERMINO>
+              [ID: b]
+          [PC: ;]
+      [FIN: fin]
+  <FIN>

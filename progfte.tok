@@ -8,7 +8,7 @@
  1     | PROG                   | rafi                 | 100        | 1
  2     | ID                     | PruebaErrores        | 300        | 1
  3     | DECL                   | decl                 | 101        | 3
- 4     | TIPO                   | entero               | 102        | 4
+ 4     | ID                     | ent                  | 300        | 4
  5     | ID                     | a                    | 300        | 4
  6     | COMA                   | ,                    | 91         | 4
  7     | ID                     | b                    | 300        | 4
