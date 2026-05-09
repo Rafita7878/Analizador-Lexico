@@ -86,6 +86,32 @@ public class Main {
             System.out.println("ERROR: No se pudo escribir el archivo '" + rutaTokens + "'");
         }
 
+        // ── Ejecutar el analizador sintáctico ────────────────────────────────────
+        // Recibe los tokens y la tabla de símbolos del analizador léxico
+        AnalizadorSintactico sint = new AnalizadorSintactico(tokens, tablaSimbolos);
+        NodoArbol arbol = sint.analizar();
+        List<ErrorSintactico> erroresSint = sint.getErrores();
+
+        // ── Mostrar árbol en consola ─────────────────────────────────────────────
+        System.out.println("\n=== ÁRBOL DE ANÁLISIS SINTÁCTICO ===");
+        arbol.imprimir("");
+
+        // ── Guardar árbol en archivo ─────────────────────────────────────────────
+        try {
+            Files.writeString(Path.of("progfte.ast"), arbol.aTexto(""));
+            System.out.println("Árbol generado: progfte.ast");
+        } catch (IOException e) {
+            System.out.println("ERROR: No se pudo escribir el árbol");
+        }
+
+        // ── Mostrar errores sintácticos ───────────────────────────────────────────
+        System.out.println("\n=== ERRORES SINTÁCTICOS ===");
+        if (erroresSint.isEmpty()) {
+            System.out.println("Sin errores sintácticos.");
+        } else {
+            erroresSint.forEach(System.out::println);
+        }
+
         // ── Mostrar resumen en consola ───────────────────────────────────────
         System.out.println("\n" + contenidoTok);
     }
@@ -219,6 +245,8 @@ public class Main {
 
         return tabla;
     }
+
+    
 
     //  GENERAR CONTENIDO DEL ARCHIVO .tab
     /*
