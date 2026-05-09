@@ -1,1 +1,1 @@
-rafi PruebaErrores decl entero a, b; inicio a := 5; b := 2; imp@cad("Hola"); mientras (a + b) hacer a + b; fin
+rafi PruebaErrores decl entero a, b; inicio a := 5; b := 2; imp@cad("Hola Mundo); mientras (a + b) hacer a + b; fin
