@@ -6,8 +6,8 @@ decl
 inicio
   a := 5;
   b := 2;
-  imp@cad("Hola Mundo);
-  mientras (a + b) hacer 
+  impcad("Hola Mundo");
+  mientras (a + ) hacer 
     a + b;
     
 fin

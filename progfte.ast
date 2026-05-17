@@ -3,19 +3,13 @@
   [ID: PruebaErrores]
   <DECLARACIONES>
     [DECL: decl]
-  [INICIO: ent]
-  <SENTENCIAS>
-    <ASIGNACION>
-      [ID: ent]
-      [ASIG: :=]
-      <EXPRESION>
-        <TERMINO>
-          [ID: a]
-      [PC: ;]
-    <ASIGNACION>
+    <DECLARACION>
+      [TIPO: entero]
+      [ID: a]
       [ID: b]
-      [ASIG: :=]
       [PC: ;]
+  [INICIO: inicio]
+  <SENTENCIAS>
     <ASIGNACION>
       [ID: a]
       [ASIG: :=]
@@ -30,14 +24,17 @@
         <TERMINO>
           [CENT: 2]
       [PC: ;]
+    <IMPRESION>
+      [IMPCAD: impcad]
+      <EXPRESION>
+        <TERMINO>
+          [CLIT: "Hola Mundo"]
     <CICLO>
       [MIENTRAS: mientras]
       <EXPRESION>
         <TERMINO>
           [ID: a]
         [OPERADOR: +]
-        <TERMINO>
-          [ID: b]
       [HACER: hacer]
       <SENTENCIAS_CICLO>
         <ASIGNACION>

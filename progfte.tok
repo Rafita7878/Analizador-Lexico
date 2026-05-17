@@ -8,7 +8,7 @@
  1     | PROG                   | rafi                 | 100        | 1
  2     | ID                     | PruebaErrores        | 300        | 1
  3     | DECL                   | decl                 | 101        | 3
- 4     | ID                     | ent                  | 300        | 4
+ 4     | TIPO                   | entero               | 102        | 4
  5     | ID                     | a                    | 300        | 4
  6     | COMA                   | ,                    | 91         | 4
  7     | ID                     | b                    | 300        | 4
@@ -22,25 +22,25 @@
  15    | ASIG                   | :=                   | 90         | 8
  16    | CENT                   | 2                    | 400        | 8
  17    | PC                     | ;                    | 92         | 8
- 18    | ID_INVALIDO            | imp@cad              | -1         | 9
+ 18    | IMPCAD                 | impcad               | 111        | 9
  19    | PARENTESIS_ABIERTO     | (                    | 75         | 9
- 20    | CLIT_INVALIDA          | "Hola Mundo);       | -1         | 9
- 21    | MIENTRAS               | mientras             | 108        | 11
- 22    | PARENTESIS_ABIERTO     | (                    | 75         | 11
- 23    | ID                     | a                    | 300        | 11
- 24    | SUMA                   | +                    | 10         | 11
- 25    | ID                     | b                    | 300        | 11
- 26    | PARENTESIS_CERRADO     | )                    | 76         | 11
- 27    | HACER                  | hacer                | 109        | 11
- 28    | ID                     | a                    | 300        | 12
- 29    | SUMA                   | +                    | 10         | 12
- 30    | ID                     | b                    | 300        | 12
- 31    | PC                     | ;                    | 92         | 12
- 32    | FIN                    | fin                  | 104        | 14
+ 20    | CLIT                   | "Hola Mundo"         | 500        | 9
+ 21    | PARENTESIS_CERRADO     | )                    | 76         | 9
+ 22    | PC                     | ;                    | 92         | 9
+ 23    | MIENTRAS               | mientras             | 108        | 10
+ 24    | PARENTESIS_ABIERTO     | (                    | 75         | 10
+ 25    | ID                     | a                    | 300        | 10
+ 26    | SUMA                   | +                    | 10         | 10
+ 27    | PARENTESIS_CERRADO     | )                    | 76         | 10
+ 28    | HACER                  | hacer                | 109        | 10
+ 29    | ID                     | a                    | 300        | 11
+ 30    | SUMA                   | +                    | 10         | 11
+ 31    | ID                     | b                    | 300        | 11
+ 32    | PC                     | ;                    | 92         | 11
+ 33    | FIN                    | fin                  | 104        | 13
 
 =================================================================
   ERRORES LÉXICOS
 =================================================================
-  Renglón: 9, Identificador inválido 'imp@cad' contiene símbolo(s) no permitido(s)
-  Renglón: 9, Cadena de texto no cerrada: "Hola Mundo);  (falta comilla de cierre ")
+  Sin errores léxicos.
 =================================================================
