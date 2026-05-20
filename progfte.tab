@@ -2,3 +2,6 @@ No.   | VARIABLE             | TIPO         | VALOR INIT | REF    | LINEA
 ----------------------------------------------------------------------
 1     | a                    | entero       | 0          | 300    | 4
 2     | b                    | entero       | 0          | 300    | 4
+3     | c                    | entero       | 0          | 300    | 4
+4     | d                    | cadena       | ""         | 300    | 5
+5     | e                    | booleano     | false      | 300    | 6

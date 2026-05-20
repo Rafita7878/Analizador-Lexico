@@ -1,13 +1,20 @@
-rafi PruebaErrores
-/*comentario*/
+rafi MiPrograma /* Encabezado del programa */
+
 decl
-  entero a, b;
+  entero a, b, c;
+  cadena d;
+  booleano e;
 
 inicio
   a := 5;
-  b := 2;
-  impcad("Hola Mundo");
-  mientras (a + ) hacer 
-    a + b;
-    
+  b := 3;
+  impcad("Hola mundo");
+  leerdig(a);
+  d := a * (b - c);
+  si (a + b) entonces
+    impdig(a);
+  fin
+  mientras (b) hacer
+    b := b - a;
+  fin
 fin

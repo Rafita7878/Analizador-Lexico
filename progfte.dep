@@ -1,1 +1,1 @@
-rafi PruebaErrores decl entero a, b; inicio a := 5; b := 2; impcad("Hola Mundo"); mientras (a + ) hacer a + b; fin
+rafi MiPrograma decl entero a, b, c; cadena d; booleano e; inicio a := 5; b := 3; impcad("Hola mundo"); leerdig(a); d := a * (b - c); si (a + b) entonces impdig(a); fin mientras (b) hacer b := b - a; fin fin

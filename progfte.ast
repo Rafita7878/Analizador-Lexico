@@ -1,12 +1,21 @@
 <PROGRAMA>
   [PROG: rafi]
-  [ID: PruebaErrores]
+  [ID: MiPrograma]
   <DECLARACIONES>
     [DECL: decl]
     <DECLARACION>
       [TIPO: entero]
       [ID: a]
       [ID: b]
+      [ID: c]
+      [PC: ;]
+    <DECLARACION>
+      [TIPO: cadena]
+      [ID: d]
+      [PC: ;]
+    <DECLARACION>
+      [TIPO: booleano]
+      [ID: e]
       [PC: ;]
   [INICIO: inicio]
   <SENTENCIAS>
@@ -22,27 +31,62 @@
       [ASIG: :=]
       <EXPRESION>
         <TERMINO>
-          [CENT: 2]
+          [CENT: 3]
       [PC: ;]
     <IMPRESION>
       [IMPCAD: impcad]
       <EXPRESION>
         <TERMINO>
-          [CLIT: "Hola Mundo"]
-    <CICLO>
-      [MIENTRAS: mientras]
+          [CLIT: "Hola mundo"]
+    <LECTURA>
+      [LEERDIG: leerdig]
+      [ID: a]
+    <ASIGNACION>
+      [ID: d]
+      [ASIG: :=]
+      <EXPRESION>
+        <TERMINO>
+          [ID: a]
+          [OPERADOR: *]
+          <EXPRESION>
+            <TERMINO>
+              [ID: b]
+            [OPERADOR: -]
+            <TERMINO>
+              [ID: c]
+      [PC: ;]
+    <CONDICIONAL>
+      [SI: si]
       <EXPRESION>
         <TERMINO>
           [ID: a]
         [OPERADOR: +]
+        <TERMINO>
+          [ID: b]
+      [ENTONCES: entonces]
+      <SENTENCIAS_ENTONCES>
+        <IMPRESION>
+          [IMPDIG: impdig]
+          <EXPRESION>
+            <TERMINO>
+              [ID: a]
+      [FIN: fin]
+    <CICLO>
+      [MIENTRAS: mientras]
+      <EXPRESION>
+        <TERMINO>
+          [ID: b]
       [HACER: hacer]
       <SENTENCIAS_CICLO>
         <ASIGNACION>
-          [ID: a]
+          [ID: b]
           [ASIG: :=]
           <EXPRESION>
             <TERMINO>
               [ID: b]
+            [OPERADOR: -]
+            <TERMINO>
+              [ID: a]
           [PC: ;]
       [FIN: fin]
-  <FIN>
+  [FIN: fin]
