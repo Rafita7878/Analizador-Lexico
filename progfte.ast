@@ -22,71 +22,98 @@
     <ASIGNACION>
       [ID: a]
       [ASIG: :=]
-      <EXPRESION>
-        <TERMINO>
-          [CENT: 5]
+      <EXPR_LOGICA>
+        <EXPR_RELACIONAL>
+          <EXPRESION>
+            <TERMINO>
+              [CENT: 5]
       [PC: ;]
     <ASIGNACION>
       [ID: b]
       [ASIG: :=]
-      <EXPRESION>
-        <TERMINO>
-          [CENT: 3]
+      <EXPR_LOGICA>
+        <EXPR_RELACIONAL>
+          <EXPRESION>
+            <TERMINO>
+              [CENT: 3]
       [PC: ;]
     <IMPRESION>
       [IMPCAD: impcad]
-      <EXPRESION>
-        <TERMINO>
-          [CLIT: "Hola mundo"]
-    <LECTURA>
-      [LEERDIG: leerdig]
-      [ID: a]
-    <ASIGNACION>
-      [ID: d]
-      [ASIG: :=]
-      <EXPRESION>
-        <TERMINO>
-          [ID: a]
-          [OPERADOR: *]
+      <EXPR_LOGICA>
+        <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [ID: b]
-            [OPERADOR: -]
+              [CLIT: "Hola mundo"]
+    <LECTURA>
+      [LEERDIG: leerdig]
+      [ID: c]
+    <ASIGNACION>
+      [ID: e]
+      [ASIG: :=]
+      <EXPR_LOGICA>
+        <EXPR_RELACIONAL>
+          <EXPRESION>
+            <TERMINO>
+              <EXPR_LOGICA>
+                <EXPR_RELACIONAL>
+                  <EXPRESION>
+                    <TERMINO>
+                      [ID: a]
+                    [OPERADOR: +]
+                    <TERMINO>
+                      [ID: b]
+          [OP_RELACIONAL: >]
+          <EXPRESION>
             <TERMINO>
               [ID: c]
       [PC: ;]
     <CONDICIONAL>
       [SI: si]
-      <EXPRESION>
-        <TERMINO>
-          [ID: a]
-        [OPERADOR: +]
-        <TERMINO>
-          [ID: b]
+      <EXPR_LOGICA>
+        <EXPR_RELACIONAL>
+          <EXPRESION>
+            <TERMINO>
+              [ID: e]
+        [OP_LOGICO: y]
+        <EXPR_RELACIONAL>
+          <EXPRESION>
+            <TERMINO>
+              [NO: no]
+                [FALSO: falso]
       [ENTONCES: entonces]
       <SENTENCIAS_ENTONCES>
         <IMPRESION>
           [IMPDIG: impdig]
-          <EXPRESION>
-            <TERMINO>
-              [ID: a]
+          <EXPR_LOGICA>
+            <EXPR_RELACIONAL>
+              <EXPRESION>
+                <TERMINO>
+                  [ID: a]
       [FIN: fin]
     <CICLO>
       [MIENTRAS: mientras]
-      <EXPRESION>
-        <TERMINO>
-          [ID: b]
+      <EXPR_LOGICA>
+        <EXPR_RELACIONAL>
+          <EXPRESION>
+            <TERMINO>
+              [ID: b]
+          [OP_RELACIONAL: >]
+          <EXPRESION>
+            <TERMINO>
+              [CENT: 0]
       [HACER: hacer]
       <SENTENCIAS_CICLO>
         <ASIGNACION>
           [ID: b]
           [ASIG: :=]
-          <EXPRESION>
-            <TERMINO>
-              [ID: b]
-            [OPERADOR: -]
-            <TERMINO>
-              [ID: a]
+          <EXPR_LOGICA>
+            <EXPR_RELACIONAL>
+              <EXPRESION>
+                <TERMINO>
+                  [ID: b]
+                [OPERADOR: -]
+                <TERMINO>
+                  [ID: a]
           [PC: ;]
       [FIN: fin]
   [FIN: fin]

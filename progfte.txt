@@ -9,12 +9,12 @@ inicio
   a := 5;
   b := 3;
   impcad("Hola mundo");
-  leerdig(a);
-  d := a * (b - c);
-  si (a + b) entonces
+  leerdig(c);
+  e := (a + b) > c;
+  si (e y no falso) entonces
     impdig(a);
   fin
-  mientras (b) hacer
+  mientras (b > 0) hacer
     b := b - a;
   fin
 fin

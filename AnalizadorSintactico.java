@@ -6,8 +6,6 @@ public class AnalizadorSintactico {
     private List<ErrorSintactico> errores;
     private Map<String, String[]> tablaSimbolos;
 
-    // ── Flag para rastrear el último renglón donde se reportó un error ───────
-    // Evita reportar más de un error por renglón
     private int ultimoRenglonConError = -1;
 
     public AnalizadorSintactico(List<Token> tokens, Map<String, String[]> tablaSimbolos) {
@@ -17,23 +15,20 @@ public class AnalizadorSintactico {
         this.errores       = new ArrayList<>();
     }
 
-    // ── Registra un error SOLO si no se ha reportado uno en ese renglón ──────
-    // Garantiza máximo un error por renglón, sin mensajes ambiguos
-    private void registrarError(String mensaje, int linea) {
+    private void registrarError(String mensaje, int linea, int columna) {
         if (linea != ultimoRenglonConError) {
-            errores.add(new ErrorSintactico(mensaje, linea));
+            errores.add(new ErrorSintactico(mensaje, linea, columna));
             ultimoRenglonConError = linea;
         }
     }
 
-    // ── Devuelve true si el análisis tuvo al menos un error ──────────────────
     public boolean tieneErrores() {
         return !errores.isEmpty();
     }
 
     private Token tokenActual() {
         if (pos < tokens.size()) return tokens.get(pos);
-        return new Token("EOF", "EOF", "", 0, -1);
+        return new Token("EOF", "EOF", "", 0, 0, -1);
     }
 
     private Token consumir() {
@@ -45,7 +40,7 @@ public class AnalizadorSintactico {
     private Token esperado(String tipo) {
         Token t = tokenActual();
         if (t.tipo.equals(tipo)) return consumir();
-        registrarError("Se esperaba '" + tipo + "' pero se encontró '" + t.lexema + "'", t.linea);
+        registrarError("Se esperaba '" + tipo + "' pero se encontró '" + t.lexema + "'", t.linea, t.columna);
         return t;
     }
 
@@ -53,91 +48,80 @@ public class AnalizadorSintactico {
         return tokenActual().tipo.equals(tipo);
     }
 
-    // ── Sincronizar: saltar tokens hasta el siguiente ; ───────────────────────
     private void sincronizar() {
         while (!esTokenActual("PC")  &&
-               !esTokenActual("FIN") &&
-               !esTokenActual("EOF")) {
+                !esTokenActual("FIN") &&
+                !esTokenActual("EOF")) {
             consumir();
         }
         if (esTokenActual("PC")) consumir();
     }
 
-    // ────────────────────────────────────────────────────────────────────────
     public NodoArbol analizar() {
         NodoArbol raiz = parsePrograma();
         if (!esTokenActual("EOF") && !esTokenActual("FIN")) {
             Token t = tokenActual();
-            registrarError("Tokens inesperados al final del programa: '" + t.lexema + "'", t.linea);
+            registrarError("Tokens inesperados al final del programa: '" + t.lexema + "'", t.linea, t.columna);
         }
         return raiz;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  PROGRAMA → rafi ID decl DECLARACIONES inicio SENTENCIAS fin
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parsePrograma() {
         NodoArbol nodo = new NodoArbol("PROGRAMA");
 
         Token tokRafi = esperado("PROG");
-        nodo.agregarHijo(new NodoArbol("PROG", tokRafi.lexema));
+        nodo.agregarHijo(new NodoArbol("PROG", tokRafi));
 
         Token tokNombre = esperado("ID");
-        nodo.agregarHijo(new NodoArbol("ID", tokNombre.lexema));
+        nodo.agregarHijo(new NodoArbol("ID", tokNombre));
 
         if (esTokenActual("DECL")) {
             Token tokDecl = consumir();
             NodoArbol nodoDecl = new NodoArbol("DECLARACIONES");
-            nodoDecl.agregarHijo(new NodoArbol("DECL", tokDecl.lexema));
+            nodoDecl.agregarHijo(new NodoArbol("DECL", tokDecl));
             parseDeclaraciones(nodoDecl);
             nodo.agregarHijo(nodoDecl);
         }
 
         Token tokInicio = esperado("INICIO");
-        nodo.agregarHijo(new NodoArbol("INICIO", tokInicio.lexema));
+        nodo.agregarHijo(new NodoArbol("INICIO", tokInicio));
 
         NodoArbol nodoSentencias = new NodoArbol("SENTENCIAS");
         parseSentencias(nodoSentencias);
         nodo.agregarHijo(nodoSentencias);
 
         Token tokFin = esperado("FIN");
-        nodo.agregarHijo(new NodoArbol("FIN", tokFin.lexema));
+        nodo.agregarHijo(new NodoArbol("FIN", tokFin));
 
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  DECLARACIONES → (TIPO ID (, ID)* ;)*
-    // ────────────────────────────────────────────────────────────────────────
     private void parseDeclaraciones(NodoArbol padre) {
         while (esTokenActual("TIPO")) {
             NodoArbol nodoDecl = new NodoArbol("DECLARACION");
 
             Token tokTipo = consumir();
-            nodoDecl.agregarHijo(new NodoArbol("TIPO", tokTipo.lexema));
+            nodoDecl.agregarHijo(new NodoArbol("TIPO", tokTipo));
 
             Token tokId = esperado("ID");
-            nodoDecl.agregarHijo(new NodoArbol("ID", tokId.lexema));
+            nodoDecl.agregarHijo(new NodoArbol("ID", tokId));
 
             while (esTokenActual("COMA")) {
                 consumir();
                 Token tokIdExtra = esperado("ID");
-                nodoDecl.agregarHijo(new NodoArbol("ID", tokIdExtra.lexema));
+                nodoDecl.agregarHijo(new NodoArbol("ID", tokIdExtra));
             }
 
-            esperado("PC");
-            nodoDecl.agregarHijo(new NodoArbol("PC", ";"));
+            Token tokPC = esperado("PC");
+            nodoDecl.agregarHijo(new NodoArbol("PC", tokPC));
             padre.agregarHijo(nodoDecl);
         }
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  SENTENCIAS
-    // ────────────────────────────────────────────────────────────────────────
     private void parseSentencias(NodoArbol padre) {
         while (!esTokenActual("FIN")  &&
-               !esTokenActual("SINO") &&
-               !esTokenActual("EOF")) {
+                !esTokenActual("SINO") &&
+                !esTokenActual("EOF")) {
 
             int posAntes = pos;
             NodoArbol sentencia = parseSentencia();
@@ -146,9 +130,8 @@ public class AnalizadorSintactico {
                 padre.agregarHijo(sentencia);
             } else {
                 Token t = tokenActual();
-                // Un solo error por renglón con mensaje claro
                 registrarError("Sentencia no válida: '" + t.lexema +
-                               "' no es una instrucción reconocida del lenguaje", t.linea);
+                        "' no es una instrucción reconocida del lenguaje", t.linea, t.columna);
                 sincronizar();
             }
 
@@ -156,9 +139,6 @@ public class AnalizadorSintactico {
         }
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  SENTENCIA
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parseSentencia() {
         Token t = tokenActual();
 
@@ -166,44 +146,37 @@ public class AnalizadorSintactico {
         if (t.tipo.equals("SI"))              return parseCondicional();
         if (t.tipo.equals("MIENTRAS"))        return parseCiclo();
         if (t.tipo.equals("IMPDIG") ||
-            t.tipo.equals("IMPCAD"))          return parseImpresion();
+                t.tipo.equals("IMPCAD"))          return parseImpresion();
         if (t.tipo.equals("LEERDIG") ||
-            t.tipo.equals("LEERCAD"))         return parseLectura();
+                t.tipo.equals("LEERCAD"))         return parseLectura();
 
         return null;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  ASIGNACION → ID := EXPRESION ;
-    //  Un solo error por renglón — si falla sincroniza y sigue
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parseAsignacion() {
         NodoArbol nodo = new NodoArbol("ASIGNACION");
         Token tokId = consumir();
 
-        // Variable no declarada → un error, saltar toda la sentencia
         if (!tablaSimbolos.containsKey(tokId.lexema)) {
             registrarError("Variable '" + tokId.lexema + "' no está declarada en la sección decl",
-                           tokId.linea);
+                    tokId.linea, tokId.columna);
             sincronizar();
             return nodo;
         }
-        nodo.agregarHijo(new NodoArbol("ID", tokId.lexema));
+        nodo.agregarHijo(new NodoArbol("ID", tokId));
 
-        // Falta := → un error, saltar toda la sentencia
         if (!esTokenActual("ASIG")) {
             Token t = tokenActual();
-            registrarError("Falta ':=' en la asignación de '" + tokId.lexema + "'", t.linea);
+            registrarError("Falta ':=' en la asignación de '" + tokId.lexema + "'", t.linea, t.columna);
             sincronizar();
             return nodo;
         }
-        consumir();
-        nodo.agregarHijo(new NodoArbol("ASIG", ":="));
+        Token tokAsig = consumir();
+        nodo.agregarHijo(new NodoArbol("ASIG", tokAsig));
 
-        // Expresión vacía → un error, saltar
         if (esTokenActual("PC")) {
             registrarError("La asignación de '" + tokId.lexema + "' no tiene valor (expresión vacía)",
-                           tokId.linea);
+                    tokId.linea, tokId.columna);
             consumir();
             return nodo;
         }
@@ -211,43 +184,42 @@ public class AnalizadorSintactico {
         NodoArbol expr = parseExpresion();
         nodo.agregarHijo(expr);
 
-        // Falta ; al final
         if (!esTokenActual("PC")) {
             Token t = tokenActual();
-            registrarError("Falta ';' al final de la asignación de '" + tokId.lexema + "'", t.linea);
+            registrarError("Falta ';' al final de la asignación de '" + tokId.lexema + "'", t.linea, t.columna);
             sincronizar();
         } else {
-            consumir();
-            nodo.agregarHijo(new NodoArbol("PC", ";"));
+            Token tokPC = consumir();
+            nodo.agregarHijo(new NodoArbol("PC", tokPC));
         }
 
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  CONDICIONAL → si ( EXPRESION ) entonces SENTENCIAS [sino SENTENCIAS] fin
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parseCondicional() {
         NodoArbol nodo = new NodoArbol("CONDICIONAL");
-        consumir();
-        nodo.agregarHijo(new NodoArbol("SI", "si"));
+        Token tokSi = consumir();
+        nodo.agregarHijo(new NodoArbol("SI", tokSi));
 
         if (!esTokenActual("PARENTESIS_ABIERTO")) {
-            registrarError("Falta '(' después de 'si'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta '(' después de 'si'", t.linea, t.columna);
         } else consumir();
 
         NodoArbol condicion = parseExpresion();
         nodo.agregarHijo(condicion);
 
         if (!esTokenActual("PARENTESIS_CERRADO")) {
-            registrarError("Falta ')' para cerrar la condición del 'si'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta ')' para cerrar la condición del 'si'", t.linea, t.columna);
         } else consumir();
 
         if (!esTokenActual("ENTONCES")) {
-            registrarError("Falta 'entonces' después de la condición del 'si'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta 'entonces' después de la condición del 'si'", t.linea, t.columna);
         } else {
-            consumir();
-            nodo.agregarHijo(new NodoArbol("ENTONCES", "entonces"));
+            Token tokEntonces = consumir();
+            nodo.agregarHijo(new NodoArbol("ENTONCES", tokEntonces));
         }
 
         NodoArbol sentenciasVerdad = new NodoArbol("SENTENCIAS_ENTONCES");
@@ -255,47 +227,48 @@ public class AnalizadorSintactico {
         nodo.agregarHijo(sentenciasVerdad);
 
         if (esTokenActual("SINO")) {
-            consumir();
-            nodo.agregarHijo(new NodoArbol("SINO", "sino"));
+            Token tokSino = consumir();
+            nodo.agregarHijo(new NodoArbol("SINO", tokSino));
             NodoArbol sentenciasFalso = new NodoArbol("SENTENCIAS_SINO");
             parseSentencias(sentenciasFalso);
             nodo.agregarHijo(sentenciasFalso);
         }
 
         if (!esTokenActual("FIN")) {
-            registrarError("Falta 'fin' para cerrar el bloque 'si'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta 'fin' para cerrar el bloque 'si'", t.linea, t.columna);
         } else {
-            consumir();
-            nodo.agregarHijo(new NodoArbol("FIN", "fin"));
+            Token tokFin = consumir();
+            nodo.agregarHijo(new NodoArbol("FIN", tokFin));
         }
 
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  CICLO → mientras ( EXPRESION ) hacer SENTENCIAS fin
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parseCiclo() {
         NodoArbol nodo = new NodoArbol("CICLO");
-        consumir();
-        nodo.agregarHijo(new NodoArbol("MIENTRAS", "mientras"));
+        Token tokMientras = consumir();
+        nodo.agregarHijo(new NodoArbol("MIENTRAS", tokMientras));
 
         if (!esTokenActual("PARENTESIS_ABIERTO")) {
-            registrarError("Falta '(' después de 'mientras'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta '(' después de 'mientras'", t.linea, t.columna);
         } else consumir();
 
         NodoArbol condicion = parseExpresion();
         nodo.agregarHijo(condicion);
 
         if (!esTokenActual("PARENTESIS_CERRADO")) {
-            registrarError("Falta ')' para cerrar la condición del 'mientras'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta ')' para cerrar la condición del 'mientras'", t.linea, t.columna);
         } else consumir();
 
         if (!esTokenActual("HACER")) {
-            registrarError("Falta 'hacer' después de la condición del 'mientras'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta 'hacer' después de la condición del 'mientras'", t.linea, t.columna);
         } else {
-            consumir();
-            nodo.agregarHijo(new NodoArbol("HACER", "hacer"));
+            Token tokHacer = consumir();
+            nodo.agregarHijo(new NodoArbol("HACER", tokHacer));
         }
 
         NodoArbol cuerpo = new NodoArbol("SENTENCIAS_CICLO");
@@ -303,25 +276,23 @@ public class AnalizadorSintactico {
         nodo.agregarHijo(cuerpo);
 
         if (!esTokenActual("FIN")) {
-            registrarError("Falta 'fin' para cerrar el bloque 'mientras'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta 'fin' para cerrar el bloque 'mientras'", t.linea, t.columna);
         } else {
-            consumir();
-            nodo.agregarHijo(new NodoArbol("FIN", "fin"));
+            Token tokFin = consumir();
+            nodo.agregarHijo(new NodoArbol("FIN", tokFin));
         }
 
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  IMPRESION → (impdig | impcad) ( EXPRESION ) ;
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parseImpresion() {
         NodoArbol nodo = new NodoArbol("IMPRESION");
         Token tokImp = consumir();
-        nodo.agregarHijo(new NodoArbol(tokImp.tipo, tokImp.lexema));
+        nodo.agregarHijo(new NodoArbol(tokImp.tipo, tokImp));
 
         if (!esTokenActual("PARENTESIS_ABIERTO")) {
-            registrarError("Falta '(' después de '" + tokImp.lexema + "'", tokImp.linea);
+            registrarError("Falta '(' después de '" + tokImp.lexema + "'", tokImp.linea, tokImp.columna);
             sincronizar();
             return nodo;
         }
@@ -331,30 +302,29 @@ public class AnalizadorSintactico {
         nodo.agregarHijo(expr);
 
         if (!esTokenActual("PARENTESIS_CERRADO")) {
-            registrarError("Falta ')' para cerrar '" + tokImp.lexema + "'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta ')' para cerrar '" + tokImp.lexema + "'", t.linea, t.columna);
             sincronizar();
             return nodo;
         }
         consumir();
 
         if (!esTokenActual("PC")) {
-            registrarError("Falta ';' después de '" + tokImp.lexema + "(...)'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta ';' después de '" + tokImp.lexema + "(...)'", t.linea, t.columna);
             sincronizar();
         } else consumir();
 
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  LECTURA → (leerdig | leercad) ( ID ) ;
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parseLectura() {
         NodoArbol nodo = new NodoArbol("LECTURA");
         Token tokLeer = consumir();
-        nodo.agregarHijo(new NodoArbol(tokLeer.tipo, tokLeer.lexema));
+        nodo.agregarHijo(new NodoArbol(tokLeer.tipo, tokLeer));
 
         if (!esTokenActual("PARENTESIS_ABIERTO")) {
-            registrarError("Falta '(' después de '" + tokLeer.lexema + "'", tokLeer.linea);
+            registrarError("Falta '(' después de '" + tokLeer.lexema + "'", tokLeer.linea, tokLeer.columna);
             sincronizar();
             return nodo;
         }
@@ -363,36 +333,88 @@ public class AnalizadorSintactico {
         Token tokId = esperado("ID");
         if (!tablaSimbolos.containsKey(tokId.lexema)) {
             registrarError("Variable '" + tokId.lexema + "' no está declarada en la sección decl",
-                           tokId.linea);
+                    tokId.linea, tokId.columna);
         } else {
-            nodo.agregarHijo(new NodoArbol("ID", tokId.lexema));
+            nodo.agregarHijo(new NodoArbol("ID", tokId));
         }
 
         if (!esTokenActual("PARENTESIS_CERRADO")) {
-            registrarError("Falta ')' para cerrar '" + tokLeer.lexema + "'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta ')' para cerrar '" + tokLeer.lexema + "'", t.linea, t.columna);
             sincronizar();
             return nodo;
         }
         consumir();
 
         if (!esTokenActual("PC")) {
-            registrarError("Falta ';' después de '" + tokLeer.lexema + "(...)'", tokenActual().linea);
+            Token t = tokenActual();
+            registrarError("Falta ';' después de '" + tokLeer.lexema + "(...)'", t.linea, t.columna);
             sincronizar();
         } else consumir();
 
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  EXPRESION → TERMINO ((+ | -) TERMINO)*
-    // ────────────────────────────────────────────────────────────────────────
+    // EXPRESION → EXPR_LOGICA
     private NodoArbol parseExpresion() {
+        return parseExprLogica();
+    }
+
+    // EXPR_LOGICA → EXPR_RELACIONAL ((y | o) EXPR_RELACIONAL)*
+    private NodoArbol parseExprLogica() {
+        NodoArbol nodo = new NodoArbol("EXPR_LOGICA");
+        nodo.agregarHijo(parseExprRelacional());
+
+        while (esTokenActual("Y") || esTokenActual("O")) {
+            Token tokOp = consumir();
+            nodo.agregarHijo(new NodoArbol("OP_LOGICO", tokOp));
+
+            if (esTokenActual("PC")  || esTokenActual("PARENTESIS_CERRADO") ||
+                    esTokenActual("FIN") || esTokenActual("EOF")) {
+                Token t = tokenActual();
+                registrarError("Falta operando derecho después del operador '" +
+                        tokOp.lexema + "'", t.linea, t.columna);
+                return nodo;
+            }
+
+            nodo.agregarHijo(parseExprRelacional());
+        }
+
+        return nodo;
+    }
+
+    // EXPR_RELACIONAL → EXPR_ARITMETICA (OP_RELACIONAL EXPR_ARITMETICA)?
+    private NodoArbol parseExprRelacional() {
+        NodoArbol nodo = new NodoArbol("EXPR_RELACIONAL");
+        nodo.agregarHijo(parseExprAritmetica());
+
+        if (esTokenActual("MENOR")      || esTokenActual("MAYOR")      ||
+                esTokenActual("IGUAL")      || esTokenActual("MENORIGUAL") ||
+                esTokenActual("MAYORIGUAL") || esTokenActual("DISTINTO")) {
+            Token tokOp = consumir();
+            nodo.agregarHijo(new NodoArbol("OP_RELACIONAL", tokOp));
+
+            if (esTokenActual("PC")  || esTokenActual("PARENTESIS_CERRADO") ||
+                    esTokenActual("FIN") || esTokenActual("EOF")) {
+                Token t = tokenActual();
+                registrarError("Falta operando derecho después del operador '" +
+                        tokOp.lexema + "'", t.linea, t.columna);
+                return nodo;
+            }
+
+            nodo.agregarHijo(parseExprAritmetica());
+        }
+
+        return nodo;
+    }
+
+    // EXPR_ARITMETICA → TERMINO ((+ | -) TERMINO)*  (antes: parseExpresion)
+    private NodoArbol parseExprAritmetica() {
         NodoArbol nodo = new NodoArbol("EXPRESION");
 
-        // Operando izquierdo ausente
         if (esTokenActual("SUMA") || esTokenActual("RESTA")) {
             Token t = tokenActual();
-            registrarError("Falta operando izquierdo antes del operador '" + t.lexema + "'", t.linea);
+            registrarError("Falta operando izquierdo antes del operador '" + t.lexema + "'", t.linea, t.columna);
             consumir();
             return nodo;
         }
@@ -401,24 +423,22 @@ public class AnalizadorSintactico {
 
         while (esTokenActual("SUMA") || esTokenActual("RESTA")) {
             Token tokOp = consumir();
-            nodo.agregarHijo(new NodoArbol("OPERADOR", tokOp.lexema));
+            nodo.agregarHijo(new NodoArbol("OPERADOR", tokOp));
 
-            // Doble operador
             if (esTokenActual("SUMA")           || esTokenActual("RESTA") ||
-                esTokenActual("MULTIPLICACION") || esTokenActual("DIVISION")) {
+                    esTokenActual("MULTIPLICACION") || esTokenActual("DIVISION")) {
                 Token t = tokenActual();
                 registrarError("Doble operador en expresión: '" + tokOp.lexema +
-                               "' seguido de '" + t.lexema + "'", t.linea);
+                        "' seguido de '" + t.lexema + "'", t.linea, t.columna);
                 consumir();
                 return nodo;
             }
 
-            // Operando derecho ausente
             if (esTokenActual("PC")               || esTokenActual("PARENTESIS_CERRADO") ||
-                esTokenActual("FIN")              || esTokenActual("EOF")) {
+                    esTokenActual("FIN")              || esTokenActual("EOF")) {
                 Token t = tokenActual();
                 registrarError("Falta operando derecho después del operador '" +
-                               tokOp.lexema + "'", t.linea);
+                        tokOp.lexema + "'", t.linea, t.columna);
                 return nodo;
             }
 
@@ -428,33 +448,28 @@ public class AnalizadorSintactico {
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  TERMINO → FACTOR ((* | /) FACTOR)*
-    // ────────────────────────────────────────────────────────────────────────
     private NodoArbol parseTermino() {
         NodoArbol nodo = new NodoArbol("TERMINO");
         nodo.agregarHijo(parseFactor());
 
         while (esTokenActual("MULTIPLICACION") || esTokenActual("DIVISION")) {
             Token tokOp = consumir();
-            nodo.agregarHijo(new NodoArbol("OPERADOR", tokOp.lexema));
+            nodo.agregarHijo(new NodoArbol("OPERADOR", tokOp));
 
-            // Doble operador
             if (esTokenActual("MULTIPLICACION") || esTokenActual("DIVISION") ||
-                esTokenActual("SUMA")           || esTokenActual("RESTA")) {
+                    esTokenActual("SUMA")           || esTokenActual("RESTA")) {
                 Token t = tokenActual();
                 registrarError("Doble operador en expresión: '" + tokOp.lexema +
-                               "' seguido de '" + t.lexema + "'", t.linea);
+                        "' seguido de '" + t.lexema + "'", t.linea, t.columna);
                 consumir();
                 return nodo;
             }
 
-            // Operando derecho ausente
             if (esTokenActual("PC")               || esTokenActual("PARENTESIS_CERRADO") ||
-                esTokenActual("FIN")              || esTokenActual("EOF")) {
+                    esTokenActual("FIN")              || esTokenActual("EOF")) {
                 Token t = tokenActual();
                 registrarError("Falta operando derecho después del operador '" +
-                               tokOp.lexema + "'", t.linea);
+                        tokOp.lexema + "'", t.linea, t.columna);
                 return nodo;
             }
 
@@ -464,9 +479,7 @@ public class AnalizadorSintactico {
         return nodo;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  FACTOR → ID | CENT | CLIT | ( EXPRESION )
-    // ────────────────────────────────────────────────────────────────────────
+    // FACTOR → ID | CENT | CLIT | verdadero | falso | no FACTOR | ( EXPRESION )
     private NodoArbol parseFactor() {
         Token t = tokenActual();
 
@@ -474,37 +487,48 @@ public class AnalizadorSintactico {
             consumir();
             if (!tablaSimbolos.containsKey(t.lexema)) {
                 registrarError("Variable '" + t.lexema + "' no está declarada en la sección decl",
-                               t.linea);
+                        t.linea, t.columna);
             }
-            return new NodoArbol("ID", t.lexema);
+            return new NodoArbol("ID", t);
         }
 
         if (t.tipo.equals("CENT")) {
             consumir();
-            return new NodoArbol("CENT", t.lexema);
+            return new NodoArbol("CENT", t);
         }
 
         if (t.tipo.equals("CLIT")) {
             consumir();
-            return new NodoArbol("CLIT", t.lexema);
+            return new NodoArbol("CLIT", t);
+        }
+
+        if (t.tipo.equals("VERDADERO") || t.tipo.equals("FALSO")) {
+            consumir();
+            return new NodoArbol(t.tipo, t);
+        }
+
+        if (t.tipo.equals("NO")) {
+            consumir();
+            NodoArbol nodo = new NodoArbol("NO", t);
+            nodo.agregarHijo(parseFactor());
+            return nodo;
         }
 
         if (t.tipo.equals("PARENTESIS_ABIERTO")) {
             consumir();
             NodoArbol expr = parseExpresion();
             if (!esTokenActual("PARENTESIS_CERRADO")) {
-                registrarError("Paréntesis sin cerrar — falta ')' en la expresión", t.linea);
+                registrarError("Paréntesis sin cerrar — falta ')' en la expresión", t.linea, t.columna);
             } else {
                 consumir();
             }
             return expr;
         }
 
-        // Nada válido encontrado
         registrarError("Se encontró '" + t.lexema + "' donde se esperaba un valor o variable",
-                       t.linea);
+                t.linea, t.columna);
         consumir();
-        return new NodoArbol("ERROR", t.lexema);
+        return new NodoArbol("ERROR", t);
     }
 
     public List<ErrorSintactico> getErrores() {

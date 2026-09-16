@@ -19,6 +19,12 @@ public class NodoArbol {
     // Hijos del nodo — subárboles que cuelgan de este nodo
     public List<NodoArbol> hijos;
 
+    // Ubicación del nodo en el archivo fuente (línea y columna).
+    // En nodos hoja viene del Token de origen; en nodos intermedios
+    // se hereda automáticamente del primer hijo (ver agregarHijo).
+    public int linea = -1;
+    public int columna = -1;
+
     // Constructor para nodos intermedios (tienen hijos, no tienen valor)
     public NodoArbol(String tipo) {
         this.tipo   = tipo;
@@ -33,8 +39,26 @@ public class NodoArbol {
         this.hijos  = new ArrayList<>();
     }
 
-    // Agrega un nodo hijo a este nodo
+    // Constructor para nodos hoja creados directamente desde un Token —
+    // captura línea y columna automáticamente desde el token de origen.
+    public NodoArbol(String tipo, Token tok) {
+        this.tipo    = tipo;
+        this.valor   = tok.lexema;
+        this.hijos   = new ArrayList<>();
+        this.linea   = tok.linea;
+        this.columna = tok.columna;
+    }
+
+    // Agrega un nodo hijo a este nodo.
+    // Si este nodo todavía no tiene ubicación propia (nodo intermedio creado
+    // con new NodoArbol("TIPO")), hereda línea/columna del primer hijo que
+    // se le agregue — así todos los nodos del árbol quedan ubicables sin
+    // tener que asignarlo a mano en cada método del parser.
     public void agregarHijo(NodoArbol hijo) {
+        if (this.linea == -1 && hijo != null && hijo.linea != -1) {
+            this.linea   = hijo.linea;
+            this.columna = hijo.columna;
+        }
         hijos.add(hijo);
     }
 

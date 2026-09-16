@@ -22,6 +22,11 @@ public class AnalizadorLexico {
         RESERVADAS.put("impcad",     "IMPCAD");
         RESERVADAS.put("leerdig",    "LEERDIG");
         RESERVADAS.put("leercad",    "LEERCAD");
+        RESERVADAS.put("verdadero", "VERDADERO");
+        RESERVADAS.put("falso",     "FALSO");
+        RESERVADAS.put("y",         "Y");
+        RESERVADAS.put("o",         "O");
+        RESERVADAS.put("no",        "NO");
     }
 
     // ── Operadores aritméticos ───────────────────────────────────────────────
@@ -85,6 +90,17 @@ public class AnalizadorLexico {
         REF_TOKEN.put("PC",                  92);
         REF_TOKEN.put("COMA",                91);
         REF_TOKEN.put("ASIG",                90);
+        REF_TOKEN.put("VERDADERO",   120);
+        REF_TOKEN.put("FALSO",       121);
+        REF_TOKEN.put("Y",           122);
+        REF_TOKEN.put("O",           123);
+        REF_TOKEN.put("NO",          124);
+        REF_TOKEN.put("MENOR",       130);
+        REF_TOKEN.put("MAYOR",       131);
+        REF_TOKEN.put("IGUAL",       132);
+        REF_TOKEN.put("MENORIGUAL",  133);
+        REF_TOKEN.put("MAYORIGUAL",  134);
+        REF_TOKEN.put("DISTINTO",    135);
     }
 
     // Devuelve el número de referencia de un tipo de token
@@ -99,207 +115,183 @@ public class AnalizadorLexico {
     //  MÉTODO PRINCIPAL: recibe el código fuente y devuelve la lista de tokens
     // ────────────────────────────────────────────────────────────────────────
     public List<Token> analizar(String entrada) {
-    List<Token> tokens = new ArrayList<>();
-    int i     = 0;
-    int linea = 1;
+        List<Token> tokens = new ArrayList<>();
+        int i     = 0;
+        int linea = 1;
+        int columna = 1;
 
-    while (i < entrada.length()) {
-        char c = entrada.charAt(i);
+        while (i < entrada.length()) {
+            char c = entrada.charAt(i);
 
-        // 1. Salto de línea → el contador de lineas aumenta y se ignora el carácter
-        if (c == '\n') {
-            linea++;
-            i++;
-            continue;
-        }
-
-        // 2. Espacios, tabuladores y retorno de carro → ignorar
-        if (c == ' ' || c == '\t' || c == '\r') {
-            i++;
-            continue;
-        }
-
-        // 3. Comentarios /* ... */ → consumir sin generar token
-        if (c == '/' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '*') {
-            i += 2;
-            while (i + 1 < entrada.length()) {
-                if (entrada.charAt(i) == '\n') linea++;
-                if (entrada.charAt(i) == '*' && entrada.charAt(i + 1) == '/') {
-                    i += 2;
-                    break;
-                }
+            // 1. Salto de línea
+            if (c == '\n') {
+                    linea++;
+                columna = 1;     // reinicia columna en cada renglón nuevo
                 i++;
-            }
-            continue;
-        }
-
-        // 4. Operador de asignación := (símbolo doble, requiere lookahead)
-        if (c == ':' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '=') {
-            tokens.add(new Token("ASIGNACION", "ASIG", ":=", linea,
-                                 getRef("ASIG")));
-            i += 2;
-            continue;
-        }
-
-        // ────────────────────────────────────────────────────────────────────
-        // 5. Palabras reservadas e identificadores
-        // CORRECCIÓN: si dentro de la palabra aparece un símbolo inválido como
-        // @, #, $ etc., se acumula TODO como un solo lexema inválido y se
-        // reporta un único error — la palabra NO se divide en dos tokens.
-        // ────────────────────────────────────────────────────────────────────
-        if (Character.isLetter(c)) {
-            StringBuilder lexema    = new StringBuilder();
-            boolean       tieneError = false; // bandera: ¿encontramos símbolo inválido dentro?
-            int           lineaInicio = linea;
-
-            // Acumular mientras sea letra, dígito, guión bajo O símbolo no reconocido
-            // que NO sea un separador (espacio, salto de línea, operador conocido, etc.)
-            while (i < entrada.length()) {
-                char actual = entrada.charAt(i);
-
-                // Condiciones de corte — caracteres que SÍ terminan la palabra
-                if (actual == ' '  || actual == '\t' || actual == '\r' ||
-                    actual == '\n' || actual == ';'  || actual == ','  ||
-                    actual == '('  || actual == ')'  || actual == '{'  ||
-                    actual == '}'  || actual == '['  || actual == ']'  ||
-                    actual == '+'  || actual == '-'  || actual == '*'  ||
-                    actual == '/'  || actual == ':'  || actual == '"') {
-                    break;
-                }
-
-                // Si el carácter no es letra, dígito ni guión bajo → es inválido
-                // pero está DENTRO de una palabra, así que lo acumulamos y marcamos error
-                if (!Character.isLetterOrDigit(actual) && actual != '_') {
-                    tieneError = true;
-                }
-
-                lexema.append(actual);
-                i++;
+                continue;
             }
 
-            String palabra = lexema.toString();
+            // 2. Espacios, tabuladores y retorno de carro
+            if (c == ' ' || c == '\t' || c == '\r') {
+                i++; columna++;
+                continue;
+            }
 
-            if (tieneError) {
-                // La palabra contiene un símbolo inválido → error léxico, un solo token
-                errores.add("Renglón: " + lineaInicio +
+            // 3. Comentarios /* ... */
+            if (c == '/' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '*') {
+                i += 2; columna += 2;
+                while (i + 1 < entrada.length()) {
+                    if (entrada.charAt(i) == '\n') { linea++; columna = 1; }
+                    else columna++;
+                    if (entrada.charAt(i) == '*' && entrada.charAt(i + 1) == '/') {
+                        i += 2; columna += 2;
+                        break;
+                    }
+                    i++;
+                }
+                continue;
+            }
+
+            // 4. Operador de asignación :=
+            if (c == ':' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '=') {
+                tokens.add(new Token("ASIGNACION", "ASIG", ":=", linea, columna, getRef("ASIG")));
+                i += 2; columna += 2;
+                continue;
+            }
+
+            // 4.5 Relacionales
+            if (c == '<' || c == '>' || c == '=') {
+                char sig = (i + 1 < entrada.length()) ? entrada.charAt(i + 1) : ' ';
+                String lex; String tipo; int avance;
+                if (c == '<' && sig == '=') { lex = "<="; tipo = "MENORIGUAL"; avance = 2; }
+                else if (c == '>' && sig == '=') { lex = ">="; tipo = "MAYORIGUAL"; avance = 2; }
+                else if (c == '<' && sig == '>') { lex = "<>"; tipo = "DISTINTO"; avance = 2; }
+                else { lex = String.valueOf(c); tipo = c=='<' ? "MENOR" : (c=='>' ? "MAYOR" : "IGUAL"); avance = 1; }
+                tokens.add(new Token("RELACIONAL", tipo, lex, linea, columna, getRef(tipo)));
+                i += avance; columna += avance;
+                continue;
+            }
+
+            // 5. Palabras reservadas e identificadores
+            if (Character.isLetter(c)) {
+                StringBuilder lexema     = new StringBuilder();
+                boolean       tieneError = false;
+                int           lineaInicio   = linea;
+                int           columnaInicio = columna;   // NUEVO
+
+                while (i < entrada.length()) {
+                    char actual = entrada.charAt(i);
+                    if (actual == ' '  || actual == '\t' || actual == '\r' ||
+                            actual == '\n' || actual == ';'  || actual == ','  ||
+                            actual == '('  || actual == ')'  || actual == '{'  ||
+                            actual == '}'  || actual == '['  || actual == ']'  ||
+                            actual == '+'  || actual == '-'  || actual == '*'  ||
+                            actual == '/'  || actual == ':'  || actual == '"') {
+                        break;
+                    }
+                    if (!Character.isLetterOrDigit(actual) && actual != '_') {
+                        tieneError = true;
+                    }
+                    lexema.append(actual);
+                    i++; columna++;   // NUEVO
+                }
+
+                String palabra = lexema.toString();
+
+                if (tieneError) {
+                    errores.add("Renglón: " + lineaInicio +
                             ", Identificador inválido '" + palabra +
                             "' contiene símbolo(s) no permitido(s)");
-                tokens.add(new Token("ERROR", "ID_INVALIDO", palabra, lineaInicio, -1));
-            } else if (RESERVADAS.containsKey(palabra)) {
-                String tipo = RESERVADAS.get(palabra);
-                tokens.add(new Token("PALABRA_RESERVADA", tipo, palabra, lineaInicio,
-                                     getRef(tipo)));
-            } else {
-                tokens.add(new Token("IDENTIFICADOR", "ID", palabra, lineaInicio,
-                                     getRef("ID")));
+                    tokens.add(new Token("ERROR", "ID_INVALIDO", palabra, lineaInicio, columnaInicio, -1));
+                } else if (RESERVADAS.containsKey(palabra)) {
+                    String tipo = RESERVADAS.get(palabra);
+                    tokens.add(new Token("PALABRA_RESERVADA", tipo, palabra, lineaInicio, columnaInicio, getRef(tipo)));
+                } else {
+                    tokens.add(new Token("IDENTIFICADOR", "ID", palabra, lineaInicio, columnaInicio, getRef("ID")));
+                }
+                continue;
             }
-            continue;
-        }
 
-        // 6. Números enteros
-        if (Character.isDigit(c)) {
-            StringBuilder lexema = new StringBuilder();
-            int lineaInicio = linea;
-            while (i < entrada.length() && Character.isDigit(entrada.charAt(i))) {
-                lexema.append(entrada.charAt(i));
-                i++;
+            // 6. Números enteros
+            if (Character.isDigit(c)) {
+                StringBuilder lexema = new StringBuilder();
+                int lineaInicio   = linea;
+                int columnaInicio = columna;   // NUEVO
+                while (i < entrada.length() && Character.isDigit(entrada.charAt(i))) {
+                    lexema.append(entrada.charAt(i));
+                    i++; columna++;
+                }
+                tokens.add(new Token("CONSTANTE_ENTERA", "CENT", lexema.toString(), lineaInicio, columnaInicio, getRef("CENT")));
+                continue;
             }
-            tokens.add(new Token("CONSTANTE_ENTERA", "CENT", lexema.toString(), lineaInicio,
-                                 getRef("CENT")));
-            continue;
-        }
 
-        // ────────────────────────────────────────────────────────────────────
-        // 7. Cadenas de texto entre comillas "..."
-        // CORRECCIÓN: si la cadena nunca se cierra (llega al final del archivo
-        // o encuentra un salto de línea sin comilla de cierre), se reporta
-        // un error léxico indicando que la cadena no fue cerrada.
-        // ────────────────────────────────────────────────────────────────────
-        if (c == '"') {
-            StringBuilder lexema     = new StringBuilder();
-            int           lineaInicio = linea;
-            boolean       cerrada     = false;
-            i++; // saltar comilla de apertura
+            // 7. Cadenas de texto entre comillas "..."
+            if (c == '"') {
+                StringBuilder lexema     = new StringBuilder();
+                int           lineaInicio   = linea;
+                int           columnaInicio = columna;   // NUEVO
+                boolean       cerrada     = false;
+                i++; columna++; // saltar comilla de apertura
 
-            while (i < entrada.length()) {
-                char actual = entrada.charAt(i);
-
-                if (actual == '"') {
-                    // Comilla de cierre encontrada → cadena válida
-                    cerrada = true;
-                    i++;
-                    break;
+                while (i < entrada.length()) {
+                    char actual = entrada.charAt(i);
+                    if (actual == '"') { cerrada = true; i++; columna++; break; }
+                    if (actual == '\n') { linea++; columna = 1; break; }
+                    lexema.append(actual);
+                    i++; columna++;
                 }
 
-                if (actual == '\n') {
-                    // Salto de línea sin cerrar → la cadena es inválida
-                    // Se detiene aquí y se reporta el error
-                    linea++;
-                    break;
-                }
-
-                lexema.append(actual);
-                i++;
-            }
-
-            if (cerrada) {
-                // Cadena correctamente cerrada → token normal
-                tokens.add(new Token("CADENA_LITERAL", "CLIT",
-                                     "\"" + lexema + "\"", lineaInicio,
-                                     getRef("CLIT")));
-            } else {
-                // Cadena nunca cerrada → error léxico
-                errores.add("Renglón: " + lineaInicio +
+                if (cerrada) {
+                    tokens.add(new Token("CADENA_LITERAL", "CLIT",
+                            "\"" + lexema + "\"", lineaInicio, columnaInicio, getRef("CLIT")));
+                } else {
+                    errores.add("Renglón: " + lineaInicio +
                             ", Cadena de texto no cerrada: \"" + lexema +
                             "  (falta comilla de cierre \")");
-                tokens.add(new Token("ERROR", "CLIT_INVALIDA",
-                                     "\"" + lexema, lineaInicio, -1));
+                    tokens.add(new Token("ERROR", "CLIT_INVALIDA",
+                            "\"" + lexema, lineaInicio, columnaInicio, -1));
+                }
+                continue;
             }
-            continue;
-        }
 
-        // 8. Operadores aritméticos
-        if (ARITMETICOS.containsKey(c)) {
-            String tipo = ARITMETICOS.get(c);
-            tokens.add(new Token("ARITMETICO", tipo, String.valueOf(c), linea,
-                                 getRef(tipo)));
-            i++;
-            continue;
-        }
+            // 8. Operadores aritméticos
+            if (ARITMETICOS.containsKey(c)) {
+                String tipo = ARITMETICOS.get(c);
+                tokens.add(new Token("ARITMETICO", tipo, String.valueOf(c), linea, columna, getRef(tipo)));
+                i++; columna++;
+                continue;
+            }
 
-        // 9. Símbolos de agrupación
-        if (AGRUPACION.containsKey(c)) {
-            String tipo = AGRUPACION.get(c);
-            tokens.add(new Token("AGRUPACION", tipo, String.valueOf(c), linea,
-                                 getRef(tipo)));
-            i++;
-            continue;
-        }
+            // 9. Símbolos de agrupación
+            if (AGRUPACION.containsKey(c)) {
+                String tipo = AGRUPACION.get(c);
+                tokens.add(new Token("AGRUPACION", tipo, String.valueOf(c), linea, columna, getRef(tipo)));
+                i++; columna++;
+                continue;
+            }
 
-        // 10. Punto y coma
-        if (c == ';') {
-            tokens.add(new Token("PUNTUACION", "PC", ";", linea,
-                                 getRef("PC")));
-            i++;
-            continue;
-        }
+            // 10. Punto y coma
+            if (c == ';') {
+                tokens.add(new Token("PUNTUACION", "PC", ";", linea, columna, getRef("PC")));
+                i++; columna++;
+                continue;
+            }
 
-        // 11. Coma
-        if (c == ',') {
-            tokens.add(new Token("PUNTUACION", "COMA", ",", linea,
-                                 getRef("COMA")));
-            i++;
-            continue;
-        }
+            // 11. Coma
+            if (c == ',') {
+                tokens.add(new Token("PUNTUACION", "COMA", ",", linea, columna, getRef("COMA")));
+                i++; columna++;
+                continue;
+            }
 
-        // 12. Carácter no reconocido → error léxico con número de línea
-        errores.add("Renglón: " + linea +
+            // 12. Carácter no reconocido
+            errores.add("Renglón: " + linea +
                     ", Símbolo no identificado '" + c + "' (posible error léxico)");
-        i++;
-    }
+            i++; columna++;
+        }
 
-    return tokens;
-}
+        return tokens;
+    }
 
     // Devuelve los errores encontrados durante el análisis
     public List<String> getErrores() {

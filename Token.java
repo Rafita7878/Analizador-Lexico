@@ -1,7 +1,7 @@
 /*
-    *Cada vez que el analizadorLexico reconoce una palabra reservada, identificador o
-    *cualquier simbolo valido en el codigo fuente, se crea un token que almacena 
-    *la informacion relevante de esa unidad.
+ *Cada vez que el analizadorLexico reconoce una palabra reservada, identificador o
+ *cualquier simbolo valido en el codigo fuente, se crea un token que almacena
+ *la informacion relevante de esa unidad.
  */
 public class Token {
     // categoria general a la que pertenece el token.
@@ -15,6 +15,7 @@ public class Token {
     public int    linea;   // número de línea en el archivo fuente
     //numero de referencia numerica asignada a cada token para facilitar su manejo en el analizador sintactico.
     public int    ref;     // número de referencia del token
+    public int columna; //columna donde inicia el lexema en su renglon
 
     // Constructor del token
     /**
@@ -26,20 +27,22 @@ public class Token {
      * @param tipo    Tipo específico del token   (ej. "INICIO")
      * @param lexema  Texto original del código   (ej. "inicio")
      * @param linea   Línea donde fue encontrado  (ej. 8)
+     * @param columna Columna donde inicia el lexema en su renglón
      * @param ref     Número de referencia        (ej. 103)
      */
-    public Token(String nombre, String tipo, String lexema, int linea, int ref) {
+    public Token(String nombre, String tipo, String lexema, int linea, int columna, int ref) {
         this.nombre = nombre;
         this.tipo   = tipo;
         this.lexema = lexema;
         this.linea  = linea;
+        this.columna = columna;
         this.ref    = ref;
     }
 
     // Formato para mostrar en consola y en el archivo .tok
     @Override
     public String toString() {
-        return String.format("Renglón: %d, Lexema: %-15s Token: %-5d %s",
-                             linea, lexema, ref, tipo);
+        return String.format("Renglón: %d, Columna: %d, Lexema: %-15s Token: %-5d %s",
+                linea, columna, lexema, ref, tipo);
     }
 }
