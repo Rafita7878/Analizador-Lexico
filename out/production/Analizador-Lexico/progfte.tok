@@ -37,45 +37,48 @@
  30    | PC                     | ;                    | 92         | 11
  31    | LEERDIG                | leerdig              | 112        | 12
  32    | PARENTESIS_ABIERTO     | (                    | 75         | 12
- 33    | ID                     | a                    | 300        | 12
+ 33    | ID                     | c                    | 300        | 12
  34    | PARENTESIS_CERRADO     | )                    | 76         | 12
  35    | PC                     | ;                    | 92         | 12
- 36    | ID                     | d                    | 300        | 13
+ 36    | ID                     | e                    | 300        | 13
  37    | ASIG                   | :=                   | 90         | 13
- 38    | ID                     | a                    | 300        | 13
- 39    | MULTIPLICACION         | *                    | 12         | 13
- 40    | PARENTESIS_ABIERTO     | (                    | 75         | 13
+ 38    | PARENTESIS_ABIERTO     | (                    | 75         | 13
+ 39    | ID                     | a                    | 300        | 13
+ 40    | SUMA                   | +                    | 10         | 13
  41    | ID                     | b                    | 300        | 13
- 42    | RESTA                  | -                    | 11         | 13
- 43    | ID                     | c                    | 300        | 13
- 44    | PARENTESIS_CERRADO     | )                    | 76         | 13
+ 42    | PARENTESIS_CERRADO     | )                    | 76         | 13
+ 43    | MAYOR                  | >                    | 131        | 13
+ 44    | ID                     | c                    | 300        | 13
  45    | PC                     | ;                    | 92         | 13
  46    | SI                     | si                   | 105        | 14
  47    | PARENTESIS_ABIERTO     | (                    | 75         | 14
- 48    | ID                     | a                    | 300        | 14
- 49    | SUMA                   | +                    | 10         | 14
- 50    | ID                     | b                    | 300        | 14
- 51    | PARENTESIS_CERRADO     | )                    | 76         | 14
- 52    | ENTONCES               | entonces             | 106        | 14
- 53    | IMPDIG                 | impdig               | 110        | 15
- 54    | PARENTESIS_ABIERTO     | (                    | 75         | 15
- 55    | ID                     | a                    | 300        | 15
- 56    | PARENTESIS_CERRADO     | )                    | 76         | 15
- 57    | PC                     | ;                    | 92         | 15
- 58    | FIN                    | fin                  | 104        | 16
- 59    | MIENTRAS               | mientras             | 108        | 17
- 60    | PARENTESIS_ABIERTO     | (                    | 75         | 17
- 61    | ID                     | b                    | 300        | 17
- 62    | PARENTESIS_CERRADO     | )                    | 76         | 17
- 63    | HACER                  | hacer                | 109        | 17
- 64    | ID                     | b                    | 300        | 18
- 65    | ASIG                   | :=                   | 90         | 18
- 66    | ID                     | b                    | 300        | 18
- 67    | RESTA                  | -                    | 11         | 18
- 68    | ID                     | a                    | 300        | 18
- 69    | PC                     | ;                    | 92         | 18
- 70    | FIN                    | fin                  | 104        | 19
- 71    | FIN                    | fin                  | 104        | 20
+ 48    | ID                     | e                    | 300        | 14
+ 49    | Y                      | y                    | 122        | 14
+ 50    | NO                     | no                   | 124        | 14
+ 51    | FALSO                  | falso                | 121        | 14
+ 52    | PARENTESIS_CERRADO     | )                    | 76         | 14
+ 53    | ENTONCES               | entonces             | 106        | 14
+ 54    | IMPDIG                 | impdig               | 110        | 15
+ 55    | PARENTESIS_ABIERTO     | (                    | 75         | 15
+ 56    | ID                     | a                    | 300        | 15
+ 57    | PARENTESIS_CERRADO     | )                    | 76         | 15
+ 58    | PC                     | ;                    | 92         | 15
+ 59    | FIN                    | fin                  | 104        | 16
+ 60    | MIENTRAS               | mientras             | 108        | 17
+ 61    | PARENTESIS_ABIERTO     | (                    | 75         | 17
+ 62    | ID                     | b                    | 300        | 17
+ 63    | MAYOR                  | >                    | 131        | 17
+ 64    | CENT                   | 0                    | 400        | 17
+ 65    | PARENTESIS_CERRADO     | )                    | 76         | 17
+ 66    | HACER                  | hacer                | 109        | 17
+ 67    | ID                     | b                    | 300        | 18
+ 68    | ASIG                   | :=                   | 90         | 18
+ 69    | ID                     | b                    | 300        | 18
+ 70    | RESTA                  | -                    | 11         | 18
+ 71    | ID                     | a                    | 300        | 18
+ 72    | PC                     | ;                    | 92         | 18
+ 73    | FIN                    | fin                  | 104        | 19
+ 74    | FIN                    | fin                  | 104        | 20
 
 =================================================================
   ERRORES LÉXICOS

@@ -44,6 +44,7 @@ public class AnalizadorSemantico {
         errores.add(new ErrorSemantico(mensaje, linea, columna));
     }
 
+    // Busca el primer hijo directo de 'nodo' cuyo tipo sea 'tipo'
     private NodoArbol buscarHijoTipo(NodoArbol nodo, String tipo) {
         if (nodo == null) return null;
         for (NodoArbol h : nodo.hijos) {
@@ -174,7 +175,8 @@ public class AnalizadorSemantico {
     }
 
     // tipoDe: calcula recursivamente el tipo de cualquier nodo de expresión
-    // y registra errores de tipo en el camino.
+    // y va registrando los errores de tipo que encuentre en el camino.
+    // Devuelve "entero" | "cadena" | "booleano" | "error"
     private String tipoDe(NodoArbol n) {
         if (n == null) return "error";
 
@@ -244,6 +246,15 @@ public class AnalizadorSemantico {
                 }
                 if (operandos.isEmpty()) return "error";
 
+                // Un solo operando → EXPRESION/TERMINO son solo envoltorios de la
+                // gramática (no hay ningún + - * / real aplicándose), así que el
+                // valor pasa hacia arriba tal cual, sea cadena, booleano o entero.
+                if (operandos.size() == 1) {
+                    return tipoDe(operandos.get(0));
+                }
+
+                // Con 2+ operandos sí hay un operador aritmético combinándolos,
+                // y esos operadores solo están definidos para 'entero'.
                 String tipoResultado = tipoDe(operandos.get(0));
                 for (int i = 1; i < operandos.size(); i++) {
                     String t = tipoDe(operandos.get(i));
