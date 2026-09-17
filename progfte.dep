@@ -1,1 +1,1 @@
-rafi MiPrograma decl entero a, b, c; cadena d; booleano e; inicio a := 5; b := 3; impcad("Hola mundo"); leerdig(c); e := (a + b) > c; si (e y no falso) entonces impdig(a); fin mientras (b > 0) hacer b := b - a; fin fin
+rafi MiPrograma decl entero a, b, c; cadena d; booleano e; inicio a := 5; b := 3; impcad("Hola mundo"); leercad(c); e := (a + b) > c; si (e y no falso) entonces impdig(a); fin mientras (b > 0) hacer b := b - a; fin fin

@@ -97,10 +97,9 @@
           <EXPRESION>
             <TERMINO>
               [ID: b]
-          [OP_RELACIONAL: >]
-          <EXPRESION>
+            [OPERADOR: -]
             <TERMINO>
-              [CENT: 0]
+              [ID: a]
       [HACER: hacer]
       <SENTENCIAS_CICLO>
         <ASIGNACION>

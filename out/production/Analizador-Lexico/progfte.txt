@@ -9,7 +9,7 @@ inicio
   a := 5;
   b := 3;
   impcad("Hola mundo");
-  leerdig(c);
+  leercad(c);
   e := (a + b) > c;
   si (e y no falso) entonces
     impdig(a);

@@ -2,6 +2,4 @@
   ANALIZADOR SEMANTICO — LENGUAJE RAFI
 =================================================================
 
-Error semántico en renglón 11, columna 10: Los operadores aritméticos (+, -, *, /) solo son válidos entre valores de tipo 'entero' (se encontró 'cadena')
-Error semántico en renglón 14, columna 7: Los operadores aritméticos (+, -, *, /) solo son válidos entre valores de tipo 'entero' (se encontró 'booleano')
-Error semántico en renglón 14, columna 11: Los operadores aritméticos (+, -, *, /) solo son válidos entre valores de tipo 'entero' (se encontró 'booleano')
+Error semántico en renglón 17, columna 13: La condición de 'mientras' debe ser de tipo 'booleano' (se encontró 'entero')

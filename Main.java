@@ -43,6 +43,9 @@ public class Main {
         }
 
         // ── Generar archivo depurado .dep ────────────────────────────────────
+        // Se llama a depurar() antes del análisis para limpiar el código fuente.
+        // El archivo .dep es el programa sin comentarios, espacios múltiples
+        // ni líneas vacías — la versión lista para las fases siguientes.
         String codigoDepurado = depurar(codigoFuente);
         try {
             Files.writeString(Path.of(rutaDepurado), codigoDepurado);
@@ -52,13 +55,21 @@ public class Main {
         }
 
         // ── Analizar el código fuente ────────────────────────────────────────
+        // AnalizadorLexico.analizar() recorre el código carácter a carácter
+        // y devuelve una lista de objetos Token con toda la información
+        // de cada unidad léxica reconocida: nombre, tipo, lexema, línea y ref.
         AnalizadorLexico alex = new AnalizadorLexico();
         List<Token> tokens = alex.analizar(codigoFuente);
 
         // ── Construir tabla de símbolos ──────────────────────────────────────
+        // Se recorre la lista de tokens buscando el patrón de declaración:
+        // DECL → TIPO → ID, ID, ID ; → hasta encontrar INICIO.
+        // Cada variable encontrada se registra con su tipo, valor inicial y línea.
         Map<String, String[]> tablaSimbolos = construirTablaSimbolos(tokens);
 
         // ── Generar archivo .tab ─────────────────────────────────────────────
+        // Contiene únicamente las variables declaradas en la sección decl,
+        // con su número de referencia (REF=300 para todos los identificadores).
         String contenidoTabla = generarContenidoTabla(tablaSimbolos);
         try {
             Files.writeString(Path.of(rutaTabla), contenidoTabla);
@@ -68,6 +79,10 @@ public class Main {
         }
 
         // ── Generar archivo .tok (tabla de símbolos + lista de tokens) ───────
+        // se llama al metodo generarArchivoTok() que construye el contenido completo
+        // del archivo .tok
+        // incluyendo la tabla de símbolos, la lista de tokens con formato detallado, un
+        // resumen por categoría y los errores léxicos encontrados.
         String contenidoTok = generarArchivoTok(tablaSimbolos, tokens, alex.getErrores());
         try {
             Files.writeString(Path.of(rutaTokens), contenidoTok);
@@ -83,8 +98,6 @@ public class Main {
 
         // ── Árbol SOLO si no hay errores sintácticos ──────────────────────────────
         if (!sint.tieneErrores()) {
-            System.out.println("\n=== ÁRBOL DE ANÁLISIS SINTÁCTICO ===");
-            arbol.imprimir("");
             try {
                 Files.writeString(Path.of("progfte.ast"), arbol.aTexto(""));
                 System.out.println("Arbol generado: progfte.ast");
@@ -104,6 +117,11 @@ public class Main {
         }
 
         // ── Ejecutar el analizador semántico — SOLO si no hay errores sintácticos ──
+        // El semántico recorre el mismo árbol (arbol) que ya construyó el sintáctico
+        // y construye su propia tabla de símbolos a partir del AST (ver
+        // AnalizadorSemantico.verificarDeclaraciones), en vez de reutilizar
+        // tablaSimbolos, para poder detectar variables declaradas dos veces
+        // como un error semántico real, con línea y columna.
         List<ErrorSemantico> erroresSem = new ArrayList<>();
         if (!sint.tieneErrores()) {
             AnalizadorSemantico sem = new AnalizadorSemantico();
@@ -138,12 +156,20 @@ public class Main {
         } catch (IOException e) {
             System.out.println("ERROR: No se pudo escribir el archivo 'progfte.sem'");
         }
-
-        // ── Mostrar resumen en consola ───────────────────────────────────────
-        System.out.println("\n" + contenidoTok);
     }
 
     // GENERAR CONTENIDO DEL ARCHIVO .tok
+    /*
+     * Genera el contenido completo del archivo progfte.tok con el siguiente
+     * formato:
+     * ── Encabezado con título y nombre del archivo
+     * ── Lista de tokens encontrados con formato tabular:
+     * Num | Token | Lexema | Referencia | Linea
+     * ── Resumen por categoría de tokens (no implementado en esta versión)
+     * ── Sección de errores léxicos encontrados durante el análisis
+     * El método recibe la tabla de símbolos, la lista de tokens y la lista de
+     * errores léxicos para incluir toda esta información en el archivo .tok.
+     */
     private static String generarArchivoTok(Map<String, String[]> tabla,
                                             List<Token> tokens,
                                             List<String> errores) {
@@ -151,12 +177,14 @@ public class Main {
         String separador = "=".repeat(65) + "\n";
         String divisor = "-".repeat(65) + "\n";
 
+        // ── Encabezado del archivo ───────────────────────────────────────────────
         sb.append(separador);
         sb.append("  ANALIZADOR LÉXICO — LENGUAJE RAFI\n");
         sb.append("  Archivo: progfte.tok\n");
         sb.append(separador);
         sb.append("\n");
 
+        // ── Lista de tokens en formato tabular ───────────────────────────────────
         sb.append(String.format(" %-5s | %-22s | %-20s | %-10s | %s%n",
                 "NUM", "TOKEN", "LEXEMA", "REFERENCIA", "LINEA"));
         sb.append(divisor);
@@ -168,6 +196,7 @@ public class Main {
         }
         sb.append("\n");
 
+        // ── Errores léxicos ───────────────────────────────────────────────────────
         sb.append(separador);
         sb.append("  ERRORES LÉXICOS\n");
         sb.append(separador);
@@ -184,6 +213,16 @@ public class Main {
     }
 
     // CONSTRUIR TABLA DE SÍMBOLOS
+    /*
+     * Busca el patrón de declaración de variables del lenguaje RAFI:
+     * decl → tipo nombreVar1, nombreVar2 ; → tipo nombreVar3 ; → inicio
+     * Cada variable se almacena en un Map con:
+     * Clave → nombre de la variable (lexema del identificador)
+     * Valor → arreglo String[] con tres posiciones:
+     * [0] tipo de dato ("entero", "cadena", "booleano")
+     * [1] valor inicial ("0", '""', "false")
+     * [2] número de línea donde fue declarada
+     */
     private static Map<String, String[]> construirTablaSimbolos(List<Token> tokens) {
         Map<String, String[]> tabla = new LinkedHashMap<>();
         boolean dentroDecl = false;
@@ -192,22 +231,26 @@ public class Main {
 
         while (i < tokens.size()) {
             Token t = tokens.get(i);
+            // Al encontrar DECL se activa la bandera para empezar a registrar variables
             if (t.tipo.equals("DECL")) {
                 dentroDecl = true;
                 i++;
                 continue;
             }
 
+            // Al encontrar INICIO se desactiva la bandera — ya no hay más declaraciones
             if (t.tipo.equals("INICIO")) {
                 dentroDecl = false;
                 i++;
                 continue;
             }
 
+            // Dentro de decl: al encontrar un TIPO se leen todos los IDs hasta el ";"
             if (dentroDecl && t.tipo.equals("TIPO")) {
-                tipoActual = t.lexema;
+                tipoActual = t.lexema; // guarda entero, cadena, booleano
                 i++;
 
+                // Avanzar hasta el punto y coma registrando cada identificador encontrado
                 while (i < tokens.size() && !tokens.get(i).tipo.equals("PC")) {
                     Token actual = tokens.get(i);
                     if (actual.nombre.equals("IDENTIFICADOR")) {
@@ -225,7 +268,7 @@ public class Main {
                     }
                     i++;
                 }
-                i++;
+                i++; // saltar el punto y coma
                 continue;
             }
 
@@ -236,9 +279,18 @@ public class Main {
     }
 
     // GENERAR CONTENIDO DEL ARCHIVO .tab
+    /*
+     * Genera el contenido del archivo progfte.tab.
+     *
+     * Produce una tabla formateada con todas las variables declaradas
+     * en la sección decl del programa fuente. Incluye la columna REF
+     * con el número de referencia de los identificadores (siempre 300).
+     *
+     */
     private static String generarContenidoTabla(Map<String, String[]> tabla) {
         StringBuilder sb = new StringBuilder();
 
+        // Encabezado con columna REF incluida
         sb.append(String.format("%-5s | %-20s | %-12s | %-10s | %-6s | %s%n",
                 "No.", "VARIABLE", "TIPO", "VALOR INIT", "REF", "LINEA"));
         sb.append("-".repeat(70) + "\n");
@@ -247,16 +299,24 @@ public class Main {
         for (Map.Entry<String, String[]> entrada : tabla.entrySet()) {
             sb.append(String.format("%-5d | %-20s | %-12s | %-10s | %-6d | %s%n",
                     contador++,
-                    entrada.getKey(),
-                    entrada.getValue()[0],
-                    entrada.getValue()[1],
-                    300,
-                    entrada.getValue()[2]));
+                    entrada.getKey(), // nombre de la variable
+                    entrada.getValue()[0], // tipo: entero, cadena, booleano
+                    entrada.getValue()[1], // valor inicial 0,"", false
+                    300, // Ref siempre sera 300 para los identificadores
+                    entrada.getValue()[2]));// linea de declaracion
         }
         return sb.toString();
     }
 
     // VALOR POR DEFECTO según tipo
+    /*
+     * Devuelve el valor inicial por defecto para un tipo de dato dado.
+     * Esto se usa al construir la tabla de símbolos para asignar un valor
+     * inicial a cada variable declarada, aunque el lenguaje RAFI no lo requiera
+     * explícitamente.
+     *
+     * Para tipos no reconocidos, devuelve "indefinido" como indicador de error.
+     */
     private static String valorPorDefecto(String tipo) {
         switch (tipo) {
             case "entero":
@@ -271,6 +331,17 @@ public class Main {
     }
 
     // MÉTODO DEPURADOR
+    /*
+     * Recorre el código fuente carácter a carácter y construye una versión
+     * limpia en UNA SOLA LÍNEA, eliminando todo lo que no forma parte
+     * de la lógica del programa.
+     * Reglas de depuración aplicadas:
+     * Comentarios /* ... *\/ → se eliminan completamente sin dejar rastro
+     * Saltos de línea \n → se reemplazan por un espacio simple
+     * Tabuladores \t → se reemplazan por un espacio simple
+     * Retornos de carro \r → se eliminan
+     * Espacios múltiples → se reducen a un solo espacio
+     */
     private static String depurar(String entrada) {
         StringBuilder resultado = new StringBuilder();
         int i = 0;
@@ -278,11 +349,12 @@ public class Main {
         while (i < entrada.length()) {
             char c = entrada.charAt(i);
 
+            // Detectar inicio de comentario /* → saltar todo hasta */
             if (c == '/' && i + 1 < entrada.length() && entrada.charAt(i + 1) == '*') {
-                i += 2;
+                i += 2; // saltar /*
                 while (i + 1 < entrada.length()) {
                     if (entrada.charAt(i) == '*' && entrada.charAt(i + 1) == '/') {
-                        i += 2;
+                        i += 2; // saltar */
                         break;
                     }
                     i++;
@@ -290,7 +362,10 @@ public class Main {
                 continue;
             }
 
+            // Saltos de línea, tabuladores y retornos de carro →
+            // se reemplazan por un espacio simple para mantener separación entre palabras
             if (c == '\n' || c == '\t' || c == '\r') {
+                // Solo agregar espacio si el último carácter no era ya un espacio
                 if (resultado.length() > 0 &&
                         resultado.charAt(resultado.length() - 1) != ' ') {
                     resultado.append(' ');
@@ -299,6 +374,7 @@ public class Main {
                 continue;
             }
 
+            // Espacios múltiples consecutivos → reducir a uno solo
             if (c == ' ') {
                 if (resultado.length() > 0 &&
                         resultado.charAt(resultado.length() - 1) != ' ') {
@@ -308,10 +384,12 @@ public class Main {
                 continue;
             }
 
+            // Cualquier otro carácter se copia tal cual
             resultado.append(c);
             i++;
         }
 
+        // trim() elimina cualquier espacio residual al inicio y al final
         return resultado.toString().trim();
     }
 }

@@ -35,7 +35,7 @@
  28    | CLIT                   | "Hola mundo"         | 500        | 11
  29    | PARENTESIS_CERRADO     | )                    | 76         | 11
  30    | PC                     | ;                    | 92         | 11
- 31    | LEERDIG                | leerdig              | 112        | 12
+ 31    | LEERCAD                | leercad              | 113        | 12
  32    | PARENTESIS_ABIERTO     | (                    | 75         | 12
  33    | ID                     | c                    | 300        | 12
  34    | PARENTESIS_CERRADO     | )                    | 76         | 12

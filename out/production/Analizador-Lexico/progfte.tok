@@ -67,8 +67,8 @@
  60    | MIENTRAS               | mientras             | 108        | 17
  61    | PARENTESIS_ABIERTO     | (                    | 75         | 17
  62    | ID                     | b                    | 300        | 17
- 63    | MAYOR                  | >                    | 131        | 17
- 64    | CENT                   | 0                    | 400        | 17
+ 63    | RESTA                  | -                    | 11         | 17
+ 64    | ID                     | a                    | 300        | 17
  65    | PARENTESIS_CERRADO     | )                    | 76         | 17
  66    | HACER                  | hacer                | 109        | 17
  67    | ID                     | b                    | 300        | 18
