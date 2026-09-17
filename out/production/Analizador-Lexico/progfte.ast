@@ -43,10 +43,10 @@
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [CLIT: "Hola mundo"]
+              [ID: a]
     <LECTURA>
       [LEERDIG: leerdig]
-      [ID: c]
+      [ID: b]
     <ASIGNACION>
       [ID: e]
       [ASIG: :=]
@@ -97,9 +97,10 @@
           <EXPRESION>
             <TERMINO>
               [ID: b]
-            [OPERADOR: -]
+          [OP_RELACIONAL: >]
+          <EXPRESION>
             <TERMINO>
-              [ID: a]
+              [CENT: 0]
       [HACER: hacer]
       <SENTENCIAS_CICLO>
         <ASIGNACION>

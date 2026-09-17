@@ -32,12 +32,12 @@
  25    | PC                     | ;                    | 92         | 10
  26    | IMPCAD                 | impcad               | 111        | 11
  27    | PARENTESIS_ABIERTO     | (                    | 75         | 11
- 28    | CLIT                   | "Hola mundo"         | 500        | 11
+ 28    | ID                     | a                    | 300        | 11
  29    | PARENTESIS_CERRADO     | )                    | 76         | 11
  30    | PC                     | ;                    | 92         | 11
  31    | LEERDIG                | leerdig              | 112        | 12
  32    | PARENTESIS_ABIERTO     | (                    | 75         | 12
- 33    | ID                     | c                    | 300        | 12
+ 33    | ID                     | b                    | 300        | 12
  34    | PARENTESIS_CERRADO     | )                    | 76         | 12
  35    | PC                     | ;                    | 92         | 12
  36    | ID                     | e                    | 300        | 13
@@ -67,8 +67,8 @@
  60    | MIENTRAS               | mientras             | 108        | 17
  61    | PARENTESIS_ABIERTO     | (                    | 75         | 17
  62    | ID                     | b                    | 300        | 17
- 63    | RESTA                  | -                    | 11         | 17
- 64    | ID                     | a                    | 300        | 17
+ 63    | MAYOR                  | >                    | 131        | 17
+ 64    | CENT                   | 0                    | 400        | 17
  65    | PARENTESIS_CERRADO     | )                    | 76         | 17
  66    | HACER                  | hacer                | 109        | 17
  67    | ID                     | b                    | 300        | 18

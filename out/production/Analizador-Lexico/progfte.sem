@@ -2,4 +2,4 @@
   ANALIZADOR SEMANTICO — LENGUAJE RAFI
 =================================================================
 
-Error semántico en renglón 17, columna 13: La condición de 'mientras' debe ser de tipo 'booleano' (se encontró 'entero')
+Error semántico en renglón 11, columna 10: 'impcad' espera un valor de tipo 'cadena' pero se encontró 'entero'

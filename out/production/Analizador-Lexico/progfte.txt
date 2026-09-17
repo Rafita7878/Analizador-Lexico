@@ -8,8 +8,8 @@ decl
 inicio
   a := 5;
   b := 3;
-  impcad("Hola mundo");
-  leercad(c);
+  impcad(a);
+  leerdig(d);
   e := (a + b) > c;
   si (e y no falso) entonces
     impdig(a);

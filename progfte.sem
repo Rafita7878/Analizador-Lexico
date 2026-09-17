@@ -2,4 +2,5 @@
   ANALIZADOR SEMANTICO — LENGUAJE RAFI
 =================================================================
 
-Error semántico en renglón 12, columna 11: 'leercad' requiere una variable de tipo 'cadena' pero 'c' es de tipo 'entero'
+Error semántico en renglón 11, columna 10: 'impcad' espera un valor de tipo 'cadena' pero se encontró 'entero'
+Error semántico en renglón 12, columna 11: 'leerdig' requiere una variable de tipo 'entero' pero 'd' es de tipo 'cadena'

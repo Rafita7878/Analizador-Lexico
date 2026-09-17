@@ -43,10 +43,10 @@
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [CLIT: "Hola mundo"]
+              [ID: a]
     <LECTURA>
-      [LEERCAD: leercad]
-      [ID: c]
+      [LEERDIG: leerdig]
+      [ID: d]
     <ASIGNACION>
       [ID: e]
       [ASIG: :=]

@@ -142,16 +142,20 @@ public class AnalizadorSemantico {
         }
     }
 
-    // IMPRESION: por indicación del profesor, NO se exige que impdig reciba
-    // 'entero' ni que impcad reciba 'cadena' (equivalente a las reglas de
-    // printInt/printBool de la rúbrica genérica, que este equipo no aplica).
-    // Aun así se evalúa la expresión con tipoDe(...) para seguir detectando
-    // otros errores independientes dentro de ella (variable no declarada,
-    // operación aritmética inválida, etc.).
+    // IMPRESION: impdig exige entero, impcad exige cadena
     private void verificarImpresion(NodoArbol s) {
-        NodoArbol exprNodo = buscarHijoTipo(s, "EXPR_LOGICA");
+        if (s.hijos.isEmpty()) return;
+        String instruccion   = s.hijos.get(0).tipo; // "IMPDIG" o "IMPCAD"
+        NodoArbol exprNodo   = buscarHijoTipo(s, "EXPR_LOGICA");
         if (exprNodo == null) return;
-        tipoDe(exprNodo);
+
+        String tipoEsperado = instruccion.equals("IMPDIG") ? "entero" : "cadena";
+        String tipoReal     = tipoDe(exprNodo);
+
+        if (!tipoReal.equals(tipoEsperado) && !tipoReal.equals("error")) {
+            registrarError("'" + s.hijos.get(0).valor + "' espera un valor de tipo '" + tipoEsperado +
+                    "' pero se encontró '" + tipoReal + "'", exprNodo);
+        }
     }
 
     // LECTURA: leerdig exige variable entero, leercad exige variable cadena
