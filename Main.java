@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
@@ -29,6 +30,11 @@ public class Main {
         String rutaTabla = "progfte.tab";// archivo con la tabla de símbolos (variables declaradas)
         String rutaTokens = "progfte.tok";// archivo completo con tabla de símbolos + lista de tokens + resumen +
         // errores
+
+        // Scanner compartido: se usa más adelante SOLO cuando la ejecución
+        // real del programa (Ejecutor) llegue a un leerdig/leercad y necesite
+        // preguntarle algo al usuario por teclado.
+        Scanner teclado = new Scanner(System.in);
 
         // ── Leer el archivo fuente ───────────────────────────────────────────
         // Si el archivo no existe o no se puede leer, se muestra un mensaje de error y
@@ -122,9 +128,9 @@ public class Main {
         // AnalizadorSemantico.verificarDeclaraciones), en vez de reutilizar
         // tablaSimbolos, para poder detectar variables declaradas dos veces
         // como un error semántico real, con línea y columna.
+        AnalizadorSemantico sem = new AnalizadorSemantico();
         List<ErrorSemantico> erroresSem = new ArrayList<>();
         if (!sint.tieneErrores()) {
-            AnalizadorSemantico sem = new AnalizadorSemantico();
             sem.analizar(arbol);
             erroresSem = sem.getErrores();
         }
@@ -155,6 +161,17 @@ public class Main {
             System.out.println("Archivo semántico generado : progfte.sem");
         } catch (IOException e) {
             System.out.println("ERROR: No se pudo escribir el archivo 'progfte.sem'");
+        }
+
+        // ── Ejecutar el programa de verdad — SOLO si no hay errores ni ──────────
+        // sintácticos ni semánticos. Aquí es donde leerdig/leercad realmente
+        // le preguntan al usuario por teclado y guardan lo que responda.
+        if (!sint.tieneErrores() && erroresSem.isEmpty()) {
+            System.out.println("\n=== EJECUCION DEL PROGRAMA ===");
+            Ejecutor ejecutor = new Ejecutor(sem.getTablaSimbolos(), teclado);
+            ejecutor.ejecutar(arbol);
+        } else {
+            System.out.println("\n=== EJECUCION NO REALIZADA — corrige los errores anteriores primero ===");
         }
     }
 

@@ -2,4 +2,4 @@
   ANALIZADOR SEMANTICO — LENGUAJE RAFI
 =================================================================
 
-Error semántico en renglón 11, columna 10: 'impcad' espera un valor de tipo 'cadena' pero se encontró 'entero'
+Sin errores semanticos. El programa es semánticamente correcto.

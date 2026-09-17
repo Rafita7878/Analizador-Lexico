@@ -1,1 +1,1 @@
-rafi MiPrograma decl entero a, b, c; cadena d; booleano e; inicio a := 5; b := 3; impcad(a); leerdig(d); e := (a + b) > c; si (e y no falso) entonces impdig(a); fin mientras (b > 0) hacer b := b - a; fin fin
+rafi Ejemplo1 decl entero edad, doble; cadena nombre; booleano esMayor; inicio leerdig(nombre); leercad(nombre); doble := edad * 2; esMayor := edad >= 18; impcad(nombre); impdig(doble); si (esMayor y no falso) entonces impcad("Es mayor de edad"); sino impcad("Es menor de edad"); fin mientras (edad > 0) hacer edad := edad - 1; fin fin

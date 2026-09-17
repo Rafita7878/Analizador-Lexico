@@ -1,41 +1,52 @@
 <PROGRAMA>
   [PROG: rafi]
-  [ID: MiPrograma]
+  [ID: Ejemplo1]
   <DECLARACIONES>
     [DECL: decl]
     <DECLARACION>
       [TIPO: entero]
-      [ID: a]
-      [ID: b]
-      [ID: c]
+      [ID: edad]
+      [ID: doble]
       [PC: ;]
     <DECLARACION>
       [TIPO: cadena]
-      [ID: d]
+      [ID: nombre]
       [PC: ;]
     <DECLARACION>
       [TIPO: booleano]
-      [ID: e]
+      [ID: esMayor]
       [PC: ;]
   [INICIO: inicio]
   <SENTENCIAS>
+    <LECTURA>
+      [LEERDIG: leerdig]
+      [ID: edad]
+    <LECTURA>
+      [LEERCAD: leercad]
+      [ID: nombre]
     <ASIGNACION>
-      [ID: a]
+      [ID: doble]
       [ASIG: :=]
       <EXPR_LOGICA>
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [CENT: 5]
+              [ID: edad]
+              [OPERADOR: *]
+              [CENT: 2]
       [PC: ;]
     <ASIGNACION>
-      [ID: b]
+      [ID: esMayor]
       [ASIG: :=]
       <EXPR_LOGICA>
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [CENT: 3]
+              [ID: edad]
+          [OP_RELACIONAL: >=]
+          <EXPRESION>
+            <TERMINO>
+              [CENT: 18]
       [PC: ;]
     <IMPRESION>
       [IMPCAD: impcad]
@@ -43,37 +54,21 @@
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [ID: a]
-    <LECTURA>
-      [LEERDIG: leerdig]
-      [ID: b]
-    <ASIGNACION>
-      [ID: e]
-      [ASIG: :=]
+              [ID: nombre]
+    <IMPRESION>
+      [IMPDIG: impdig]
       <EXPR_LOGICA>
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              <EXPR_LOGICA>
-                <EXPR_RELACIONAL>
-                  <EXPRESION>
-                    <TERMINO>
-                      [ID: a]
-                    [OPERADOR: +]
-                    <TERMINO>
-                      [ID: b]
-          [OP_RELACIONAL: >]
-          <EXPRESION>
-            <TERMINO>
-              [ID: c]
-      [PC: ;]
+              [ID: doble]
     <CONDICIONAL>
       [SI: si]
       <EXPR_LOGICA>
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [ID: e]
+              [ID: esMayor]
         [OP_LOGICO: y]
         <EXPR_RELACIONAL>
           <EXPRESION>
@@ -83,12 +78,21 @@
       [ENTONCES: entonces]
       <SENTENCIAS_ENTONCES>
         <IMPRESION>
-          [IMPDIG: impdig]
+          [IMPCAD: impcad]
           <EXPR_LOGICA>
             <EXPR_RELACIONAL>
               <EXPRESION>
                 <TERMINO>
-                  [ID: a]
+                  [CLIT: "Es mayor de edad"]
+      [SINO: sino]
+      <SENTENCIAS_SINO>
+        <IMPRESION>
+          [IMPCAD: impcad]
+          <EXPR_LOGICA>
+            <EXPR_RELACIONAL>
+              <EXPRESION>
+                <TERMINO>
+                  [CLIT: "Es menor de edad"]
       [FIN: fin]
     <CICLO>
       [MIENTRAS: mientras]
@@ -96,7 +100,7 @@
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [ID: b]
+              [ID: edad]
           [OP_RELACIONAL: >]
           <EXPRESION>
             <TERMINO>
@@ -104,16 +108,16 @@
       [HACER: hacer]
       <SENTENCIAS_CICLO>
         <ASIGNACION>
-          [ID: b]
+          [ID: edad]
           [ASIG: :=]
           <EXPR_LOGICA>
             <EXPR_RELACIONAL>
               <EXPRESION>
                 <TERMINO>
-                  [ID: b]
+                  [ID: edad]
                 [OPERADOR: -]
                 <TERMINO>
-                  [ID: a]
+                  [CENT: 1]
           [PC: ;]
       [FIN: fin]
   [FIN: fin]

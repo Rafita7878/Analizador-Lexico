@@ -53,7 +53,9 @@ public class AnalizadorSemantico {
         return null;
     }
 
-    // DECLARACIONES — construye la tabla y detecta variables duplicadas
+    // ────────────────────────────────────────────────────────────────────────
+    //  DECLARACIONES — construye la tabla y detecta variables duplicadas
+    // ────────────────────────────────────────────────────────────────────────
     private void verificarDeclaraciones(NodoArbol declaraciones) {
         for (NodoArbol decl : declaraciones.hijos) {
             if (!decl.tipo.equals("DECLARACION")) continue;
@@ -76,7 +78,9 @@ public class AnalizadorSemantico {
         }
     }
 
-    // SENTENCIAS — recorre cada sentencia y la despacha según su tipo
+    // ────────────────────────────────────────────────────────────────────────
+    //  SENTENCIAS — recorre cada sentencia y la despacha según su tipo
+    // ────────────────────────────────────────────────────────────────────────
     private void visitarSentencias(NodoArbol contenedor) {
         if (contenedor == null) return;
         for (NodoArbol s : contenedor.hijos) {
@@ -91,15 +95,17 @@ public class AnalizadorSemantico {
             case "CICLO":       verificarCiclo(s); break;
             case "IMPRESION":   verificarImpresion(s); break;
             case "LECTURA":     verificarLectura(s); break;
-            default: break;
+            default: break; // ERROR u otros nodos que el sintáctico ya reportó
         }
     }
 
-    // ASIGNACION: tipo(variable) debe ser igual a tipo(expresión)
+    // ────────────────────────────────────────────────────────────────────────
+    //  ASIGNACION: tipo(variable) debe ser igual a tipo(expresión)
+    // ────────────────────────────────────────────────────────────────────────
     private void verificarAsignacion(NodoArbol s) {
         NodoArbol idNodo   = buscarHijoTipo(s, "ID");
         NodoArbol exprNodo = buscarHijoTipo(s, "EXPR_LOGICA");
-        if (idNodo == null || exprNodo == null) return;
+        if (idNodo == null || exprNodo == null) return; // sentencia incompleta, ya reportada antes
 
         if (!tabla.containsKey(idNodo.valor)) {
             registrarError("Variable '" + idNodo.valor + "' no está declarada", idNodo);
@@ -115,7 +121,9 @@ public class AnalizadorSemantico {
         }
     }
 
-    // CONDICIONAL (si): condición debe ser booleano; recorre ambas ramas
+    // ────────────────────────────────────────────────────────────────────────
+    //  CONDICIONAL (si): condición debe ser booleano; recorre ambas ramas
+    // ────────────────────────────────────────────────────────────────────────
     private void verificarCondicional(NodoArbol s) {
         verificarCondicionGeneral(s, "si");
         NodoArbol entonces = buscarHijoTipo(s, "SENTENCIAS_ENTONCES");
@@ -124,7 +132,9 @@ public class AnalizadorSemantico {
         visitarSentencias(sino);
     }
 
-    // CICLO (mientras): condición debe ser booleano; recorre el cuerpo
+    // ────────────────────────────────────────────────────────────────────────
+    //  CICLO (mientras): condición debe ser booleano; recorre el cuerpo
+    // ────────────────────────────────────────────────────────────────────────
     private void verificarCiclo(NodoArbol s) {
         verificarCondicionGeneral(s, "mientras");
         NodoArbol cuerpo = buscarHijoTipo(s, "SENTENCIAS_CICLO");
@@ -142,7 +152,9 @@ public class AnalizadorSemantico {
         }
     }
 
-    // IMPRESION: impdig exige entero, impcad exige cadena
+    // ────────────────────────────────────────────────────────────────────────
+    //  IMPRESION: impdig exige entero, impcad exige cadena
+    // ────────────────────────────────────────────────────────────────────────
     private void verificarImpresion(NodoArbol s) {
         if (s.hijos.isEmpty()) return;
         String instruccion   = s.hijos.get(0).tipo; // "IMPDIG" o "IMPCAD"
@@ -158,12 +170,14 @@ public class AnalizadorSemantico {
         }
     }
 
-    // LECTURA: leerdig exige variable entero, leercad exige variable cadena
+    // ────────────────────────────────────────────────────────────────────────
+    //  LECTURA: leerdig exige variable entero, leercad exige variable cadena
+    // ────────────────────────────────────────────────────────────────────────
     private void verificarLectura(NodoArbol s) {
         if (s.hijos.isEmpty()) return;
-        String instruccion = s.hijos.get(0).tipo;
+        String instruccion = s.hijos.get(0).tipo; // "LEERDIG" o "LEERCAD"
         NodoArbol idNodo    = buscarHijoTipo(s, "ID");
-        if (idNodo == null) return;
+        if (idNodo == null) return; // no declarada, ya se reportó en el sintáctico
 
         String tipoEsperado = instruccion.equals("LEERDIG") ? "entero" : "cadena";
         String tipoVar = tabla.containsKey(idNodo.valor) ? tabla.get(idNodo.valor)[0] : "error";
@@ -174,9 +188,11 @@ public class AnalizadorSemantico {
         }
     }
 
-    // tipoDe: calcula recursivamente el tipo de cualquier nodo de expresión
-    // y va registrando los errores de tipo que encuentre en el camino.
-    // Devuelve "entero" | "cadena" | "booleano" | "error"
+    // ────────────────────────────────────────────────────────────────────────
+    //  tipoDe: calcula recursivamente el tipo de cualquier nodo de expresión
+    //  y va registrando los errores de tipo que encuentre en el camino.
+    //  Devuelve "entero" | "cadena" | "booleano" | "error"
+    // ────────────────────────────────────────────────────────────────────────
     private String tipoDe(NodoArbol n) {
         if (n == null) return "error";
 
@@ -210,6 +226,7 @@ public class AnalizadorSemantico {
             }
 
             case "EXPR_LOGICA": {
+                // Un solo hijo → simplemente pasa el tipo hacia arriba
                 if (n.hijos.size() == 1) return tipoDe(n.hijos.get(0));
 
                 boolean huboError = false;
@@ -226,6 +243,7 @@ public class AnalizadorSemantico {
             }
 
             case "EXPR_RELACIONAL": {
+                // Sin operador relacional → pasa el tipo aritmético hacia arriba
                 if (n.hijos.size() == 1) return tipoDe(n.hijos.get(0));
 
                 String izq = tipoDe(n.hijos.get(0));
@@ -274,6 +292,7 @@ public class AnalizadorSemantico {
             }
 
             default:
+                // Nodo envoltorio inesperado — intenta bajar por su primer hijo
                 if (!n.hijos.isEmpty()) return tipoDe(n.hijos.get(0));
                 return "error";
         }
