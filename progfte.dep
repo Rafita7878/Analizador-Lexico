@@ -1,1 +1,1 @@
-rafi Ejemplo1 decl entero edad, doble; cadena nombre; booleano esMayor; inicio leerdig(nombre); leercad(nombre); doble := edad * 2; esMayor := edad >= 18; impcad(nombre); impdig(doble); si (esMayor y no falso) entonces impcad("Es mayor de edad"); sino impcad("Es menor de edad"); fin mientras (edad > 0) hacer edad := edad - 1; fin fin
+rafi Ejemplo1 decl entero edad, doble; inicio leerdig(edad); leercad(nombre); doble := 0/ edad; esMayor := edad >= 18; impcad(nombre); fin

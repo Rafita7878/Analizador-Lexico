@@ -29,7 +29,12 @@ public class Main {
         String rutaDepurado = "progfte.dep";// archivo fuente depurado (sin comentarios ni espacios innecesarios)
         String rutaTabla = "progfte.tab";// archivo con la tabla de símbolos (variables declaradas)
         String rutaTokens = "progfte.tok";// archivo completo con tabla de símbolos + lista de tokens + resumen +
+        // erroresk";// archivo completo con tabla de símbolos + lista de tokens + resumen +
         // errores
+
+        // Scanner compartido: se usa más adelante SOLO cuando la ejecución
+        // real del programa (Ejecutor) llegue a un leerdig/leercad y necesite
+        // preguntarle algo al usuari
 
         // Scanner compartido: se usa más adelante SOLO cuando la ejecución
         // real del programa (Ejecutor) llegue a un leerdig/leercad y necesite
@@ -169,7 +174,15 @@ public class Main {
         if (!sint.tieneErrores() && erroresSem.isEmpty()) {
             System.out.println("\n=== EJECUCION DEL PROGRAMA ===");
             Ejecutor ejecutor = new Ejecutor(sem.getTablaSimbolos(), teclado);
-            ejecutor.ejecutar(arbol);
+            try {
+                ejecutor.ejecutar(arbol);
+            } catch (ErrorEjecucion ee) {
+                // Error que solo puede detectarse en tiempo real (ej. división entre
+                // cero cuyo divisor es una variable) — se detiene la ejecución de
+                // forma controlada, sin que el programa truene con un stack trace.
+                System.out.println("\n" + ee);
+                System.out.println("Ejecución detenida.");
+            }
         } else {
             System.out.println("\n=== EJECUCION NO REALIZADA — corrige los errores anteriores primero ===");
         }

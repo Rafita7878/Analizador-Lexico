@@ -32,9 +32,9 @@
  25    | PC                     | ;                    | 92         | 10
  26    | ID                     | doble                | 300        | 11
  27    | ASIG                   | :=                   | 90         | 11
- 28    | ID                     | edad                 | 300        | 11
- 29    | MULTIPLICACION         | *                    | 12         | 11
- 30    | CENT                   | 2                    | 400        | 11
+ 28    | CENT                   | 0                    | 400        | 11
+ 29    | DIVISION               | /                    | 13         | 11
+ 30    | CENT                   | 1                    | 400        | 11
  31    | PC                     | ;                    | 92         | 11
  32    | ID                     | esMayor              | 300        | 12
  33    | ASIG                   | :=                   | 90         | 12

@@ -31,9 +31,9 @@
         <EXPR_RELACIONAL>
           <EXPRESION>
             <TERMINO>
-              [ID: edad]
-              [OPERADOR: *]
-              [CENT: 2]
+              [CENT: 0]
+              [OPERADOR: /]
+              [CENT: 1]
       [PC: ;]
     <ASIGNACION>
       [ID: esMayor]

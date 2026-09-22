@@ -2,5 +2,3 @@ No.   | VARIABLE             | TIPO         | VALOR INIT | REF    | LINEA
 ----------------------------------------------------------------------
 1     | edad                 | entero       | 0          | 300    | 4
 2     | doble                | entero       | 0          | 300    | 4
-3     | nombre               | cadena       | ""         | 300    | 5
-4     | esMayor              | booleano     | false      | 300    | 6

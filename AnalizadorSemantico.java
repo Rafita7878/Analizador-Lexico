@@ -44,6 +44,17 @@ public class AnalizadorSemantico {
         errores.add(new ErrorSemantico(mensaje, linea, columna));
     }
 
+    // Determina si un nodo de expresión es, en el fondo, la constante literal 0
+    // (bajando por los nodos-envoltorio de un solo hijo: EXPR_LOGICA, EXPR_RELACIONAL,
+    // EXPRESION, TERMINO). Si en el camino hay más de un hijo (una operación real),
+    // ya no es un literal simple y se considera que no es "0" de forma detectable.
+    private boolean esLiteralCero(NodoArbol n) {
+        if (n == null) return false;
+        if (n.tipo.equals("CENT")) return n.valor.equals("0");
+        if (n.hijos.size() == 1) return esLiteralCero(n.hijos.get(0));
+        return false;
+    }
+
     // Busca el primer hijo directo de 'nodo' cuyo tipo sea 'tipo'
     private NodoArbol buscarHijoTipo(NodoArbol nodo, String tipo) {
         if (nodo == null) return null;
@@ -258,9 +269,11 @@ public class AnalizadorSemantico {
 
             case "EXPRESION":
             case "TERMINO": {
-                List<NodoArbol> operandos = new ArrayList<>();
+                List<NodoArbol> operandos  = new ArrayList<>();
+                List<String>    operadores = new ArrayList<>();
                 for (NodoArbol h : n.hijos) {
-                    if (!h.tipo.equals("OPERADOR")) operandos.add(h);
+                    if (h.tipo.equals("OPERADOR")) operadores.add(h.valor);
+                    else operandos.add(h);
                 }
                 if (operandos.isEmpty()) return "error";
 
@@ -274,11 +287,18 @@ public class AnalizadorSemantico {
                 // Con 2+ operandos sí hay un operador aritmético combinándolos,
                 // y esos operadores solo están definidos para 'entero'.
                 String tipoResultado = tipoDe(operandos.get(0));
-                for (int i = 1; i < operandos.size(); i++) {
-                    String t = tipoDe(operandos.get(i));
+                for (int i = 0; i < operadores.size(); i++) {
+                    NodoArbol operandoSiguiente = operandos.get(i + 1);
+                    String t = tipoDe(operandoSiguiente);
                     if (!tipoResultado.equals(t) && !tipoResultado.equals("error") && !t.equals("error")) {
                         registrarError("Operación aritmética entre tipos incompatibles: '" +
-                                tipoResultado + "' y '" + t + "'", operandos.get(i));
+                                tipoResultado + "' y '" + t + "'", operandoSiguiente);
+                        tipoResultado = "error";
+                    }
+                    // División entre cero detectable en tiempo de compilación:
+                    // el divisor es la constante literal 0 (no una variable).
+                    if (operadores.get(i).equals("/") && esLiteralCero(operandoSiguiente)) {
+                        registrarError("División entre cero: el divisor es la constante '0'", operandoSiguiente);
                         tipoResultado = "error";
                     }
                 }

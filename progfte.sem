@@ -2,4 +2,4 @@
   ANALIZADOR SEMANTICO — LENGUAJE RAFI
 =================================================================
 
-Error semántico en renglón 9, columna 11: 'leerdig' requiere una variable de tipo 'entero' pero 'nombre' es de tipo 'cadena'
+No se ejecutó el análisis semántico — hay errores sintácticos previos.

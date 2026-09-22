@@ -196,12 +196,20 @@ public class Ejecutor {
                 }
                 int resultado = (Integer) evaluar(operandos.get(0));
                 for (int i = 0; i < operadores.size(); i++) {
-                    int val = (Integer) evaluar(operandos.get(i + 1));
+                    NodoArbol nodoSiguiente = operandos.get(i + 1);
+                    int val = (Integer) evaluar(nodoSiguiente);
                     switch (operadores.get(i)) {
                         case "+": resultado += val; break;
                         case "-": resultado -= val; break;
                         case "*": resultado *= val; break;
-                        case "/": resultado /= val; break;
+                        case "/":
+                            if (val == 0) {
+                                throw new ErrorEjecucion(
+                                        "División entre cero al evaluar la expresión",
+                                        nodoSiguiente.linea, nodoSiguiente.columna);
+                            }
+                            resultado /= val;
+                            break;
                     }
                 }
                 return resultado;
