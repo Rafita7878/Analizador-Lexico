@@ -10,6 +10,9 @@
  * 5. Genera el archivo de tabla de símbolos progfte.tab
  * 6. Genera el archivo completo de tokens progfte.tok
  * 7. Muestra el resultado en consola
+ * 8. Analisis sintactico (progfte.ast) y semantico (progfte.sem)
+ * 9. Genera el codigo intermedio: codigo de tres direcciones y cuadruplos (progfte.ci)
+ * 10. Ejecuta el programa
  */
 import java.util.List;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ public class Main {
         String rutaTokens = "progfte.tok";// archivo completo con tabla de símbolos + lista de tokens + resumen +
         // erroresk";// archivo completo con tabla de símbolos + lista de tokens + resumen +
         // errores
+        String rutaCodigoIntermedio = "progfte.ci";// CAMBIO: codigo de tres direcciones + tabla de cuadruplos
 
         // Scanner compartido: se usa más adelante SOLO cuando la ejecución
         // real del programa (Ejecutor) llegue a un leerdig/leercad y necesite
@@ -166,6 +170,25 @@ public class Main {
             System.out.println("Archivo semántico generado : progfte.sem");
         } catch (IOException e) {
             System.out.println("ERROR: No se pudo escribir el archivo 'progfte.sem'");
+        }
+
+        // ── CAMBIO: Generar código intermedio — SOLO si no hay errores ──────────
+        // sintácticos ni semánticos. Recorre el mismo AST y produce el código de
+        // tres direcciones y la tabla de cuádruplos en progfte.ci. Se hace ANTES
+        // de ejecutar para que no dependa de lo que el usuario teclee.
+        if (!sint.tieneErrores() && erroresSem.isEmpty()) {
+            GeneradorCodigoIntermedio gen = new GeneradorCodigoIntermedio();
+            gen.generar(arbol);
+            String contenidoCI = gen.aTexto();
+            System.out.println("\n" + contenidoCI);
+            try {
+                Files.writeString(Path.of(rutaCodigoIntermedio), contenidoCI);
+                System.out.println("Codigo intermedio generado : " + rutaCodigoIntermedio);
+            } catch (IOException e) {
+                System.out.println("ERROR: No se pudo escribir el archivo '" + rutaCodigoIntermedio + "'");
+            }
+        } else {
+            System.out.println("\n=== CODIGO INTERMEDIO NO GENERADO — corrige los errores anteriores primero ===");
         }
 
         // ── Ejecutar el programa de verdad — SOLO si no hay errores ni ──────────

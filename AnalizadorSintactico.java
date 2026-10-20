@@ -412,7 +412,8 @@ public class AnalizadorSintactico {
     private NodoArbol parseExprAritmetica() {
         NodoArbol nodo = new NodoArbol("EXPRESION");
 
-        if (esTokenActual("SUMA") || esTokenActual("RESTA")) {
+        // CAMBIO: un '-' al inicio ya NO es error, se trata como menos unario en parseFactor
+        if (esTokenActual("SUMA")) {
             Token t = tokenActual();
             registrarError("Falta operando izquierdo antes del operador '" + t.lexema + "'", t.linea, t.columna);
             consumir();
@@ -425,7 +426,8 @@ public class AnalizadorSintactico {
             Token tokOp = consumir();
             nodo.agregarHijo(new NodoArbol("OPERADOR", tokOp));
 
-            if (esTokenActual("SUMA")           || esTokenActual("RESTA") ||
+            // CAMBIO: un '-' después del operador se permite, es menos unario (ej. a - -c)
+            if (esTokenActual("SUMA") ||
                     esTokenActual("MULTIPLICACION") || esTokenActual("DIVISION")) {
                 Token t = tokenActual();
                 registrarError("Doble operador en expresión: '" + tokOp.lexema +
@@ -456,8 +458,9 @@ public class AnalizadorSintactico {
             Token tokOp = consumir();
             nodo.agregarHijo(new NodoArbol("OPERADOR", tokOp));
 
+            // CAMBIO: un '-' después del operador se permite, es menos unario (ej. b * -c)
             if (esTokenActual("MULTIPLICACION") || esTokenActual("DIVISION") ||
-                    esTokenActual("SUMA")           || esTokenActual("RESTA")) {
+                    esTokenActual("SUMA")) {
                 Token t = tokenActual();
                 registrarError("Doble operador en expresión: '" + tokOp.lexema +
                         "' seguido de '" + t.lexema + "'", t.linea, t.columna);
@@ -479,7 +482,7 @@ public class AnalizadorSintactico {
         return nodo;
     }
 
-    // FACTOR → ID | CENT | CLIT | verdadero | falso | no FACTOR | ( EXPRESION )
+    // FACTOR → ID | CENT | CLIT | verdadero | falso | no FACTOR | - FACTOR | ( EXPRESION )
     private NodoArbol parseFactor() {
         Token t = tokenActual();
 
@@ -510,6 +513,22 @@ public class AnalizadorSintactico {
         if (t.tipo.equals("NO")) {
             consumir();
             NodoArbol nodo = new NodoArbol("NO", t);
+            nodo.agregarHijo(parseFactor());
+            return nodo;
+        }
+
+        // CAMBIO: menos unario  - FACTOR  →  nodo MENOS con un solo hijo (ej. -c, -(a+b))
+        if (t.tipo.equals("RESTA")) {
+            consumir();
+            if (esTokenActual("RESTA") || esTokenActual("SUMA") ||
+                    esTokenActual("MULTIPLICACION") || esTokenActual("DIVISION")) {
+                Token sig = tokenActual();
+                registrarError("Doble operador en expresión: '-' seguido de '" + sig.lexema + "'",
+                        sig.linea, sig.columna);
+                consumir();
+                return new NodoArbol("ERROR", sig);
+            }
+            NodoArbol nodo = new NodoArbol("MENOS", t);
             nodo.agregarHijo(parseFactor());
             return nodo;
         }

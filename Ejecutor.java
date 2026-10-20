@@ -148,6 +148,10 @@ public class Ejecutor {
             case "NO":
                 return !((Boolean) evaluar(n.hijos.get(0)));
 
+            // Menos unario: cambia el signo del operando
+            case "MENOS":
+                return -((Integer) evaluar(n.hijos.get(0)));
+
             case "EXPR_LOGICA": {
                 if (n.hijos.size() == 1) return evaluar(n.hijos.get(0));
                 boolean resultado = (Boolean) evaluar(n.hijos.get(0));

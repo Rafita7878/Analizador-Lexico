@@ -5,7 +5,7 @@ decl
 
 inicio
   leerdig(edad);
-  leercad(nombre);
-  doble := 0/ edad;
+  edad := 8;
+  doble := edad/ 1;
 
 fin
