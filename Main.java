@@ -35,6 +35,7 @@ public class Main {
         // erroresk";// archivo completo con tabla de símbolos + lista de tokens + resumen +
         // errores
         String rutaCodigoIntermedio = "progfte.ci";// CAMBIO: codigo de tres direcciones + tabla de cuadruplos
+        String rutaOptimizado = "progfte.opt";// Unidad 3: codigo optimizado, bitacora y metricas
 
         // Scanner compartido: se usa más adelante SOLO cuando la ejecución
         // real del programa (Ejecutor) llegue a un leerdig/leercad y necesite
@@ -186,6 +187,21 @@ public class Main {
                 System.out.println("Codigo intermedio generado : " + rutaCodigoIntermedio);
             } catch (IOException e) {
                 System.out.println("ERROR: No se pudo escribir el archivo '" + rutaCodigoIntermedio + "'");
+            }
+
+            // ── Unidad 3: Optimización de código (progfte.opt) ──────────────────
+            // Trabaja sobre una copia de los cuádruplos; la lista original queda intacta.
+            // Argumentos: -nombrePasada desactiva una pasada, -todas desactiva todas.
+            Optimizador opt = new Optimizador();
+            opt.configurar(args).forEach(System.out::println);
+            opt.optimizar(gen.getCuadruplos(), sem.getTablaSimbolos());
+            String contenidoOpt = opt.aTexto();
+            System.out.println("\n" + contenidoOpt);
+            try {
+                Files.writeString(Path.of(rutaOptimizado), contenidoOpt);
+                System.out.println("Codigo optimizado generado : " + rutaOptimizado);
+            } catch (IOException e) {
+                System.out.println("ERROR: No se pudo escribir el archivo '" + rutaOptimizado + "'");
             }
         } else {
             System.out.println("\n=== CODIGO INTERMEDIO NO GENERADO — corrige los errores anteriores primero ===");
