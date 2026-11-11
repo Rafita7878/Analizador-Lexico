@@ -183,7 +183,8 @@ public class Optimizador {
                         activas.get(p.nombre()) ? "X" : " ", p.nombre(), p.descripcion()));
             }
         }
-        sb.append("  Vueltas realizadas: ").append(vueltasRealizadas).append("\n\n");
+        sb.append("  Vueltas realizadas: ").append(vueltasRealizadas)
+          .append(vueltasRealizadas >= MAX_VUELTAS ? " (LIMITE: puede faltar optimizar)" : "").append("\n\n");
 
         // ── Bloques básicos del código original ──
         sb.append(separador).append("  BLOQUES BASICOS (codigo original)\n").append(separador);
@@ -210,6 +211,37 @@ public class Optimizador {
 
         sb.append(textoMetricas()).append("\n");
         sb.append(textoVerificacion());
+        return sb.toString();
+    }
+
+    // Resumen para la consola: el detalle completo (bloques, vivas, bitácora)
+    // queda en progfte.opt.
+    public String resumenConsola() {
+        StringBuilder sb = new StringBuilder();
+        String separador = "=".repeat(65) + "\n";
+        sb.append(separador).append("  OPTIMIZACION DE CODIGO — RESUMEN\n").append(separador);
+
+        Map<String, Integer> conteo = new LinkedHashMap<>();
+        for (CambioOptimizacion c : getBitacora()) conteo.merge(c.pasada, 1, Integer::sum);
+        for (Pasada p : pasadas) {
+            sb.append(String.format("  [%s] %-60s %s%n", activas.get(p.nombre()) ? "X" : " ",
+                    p.descripcion() + " (-" + p.nombre() + ")",
+                    activas.get(p.nombre()) ? conteo.getOrDefault(p.nombre(), 0) + " cambio(s)" : "desactivada"));
+        }
+        sb.append("  Vueltas realizadas: ").append(vueltasRealizadas)
+          .append(vueltasRealizadas >= MAX_VUELTAS ? " (LIMITE: puede faltar optimizar)" : "").append("\n\n");
+
+        sb.append("  Codigo optimizado:\n");
+        for (Cuadruplo c : optimizado) sb.append("  ").append(c.aTresDirecciones()).append("\n");
+        sb.append("\n").append(textoMetricas()).append("\n");
+
+        for (Verificacion v : verificaciones) {
+            sb.append("  Verificacion [").append(v.fuente).append("]: ")
+              .append(v.iguales() ? "IGUAL" : "DIFERENTE").append("\n");
+        }
+        sb.append("  ").append(verificacionCorrecta()
+                ? "La version optimizada produce la MISMA salida."
+                : "ERROR: la version optimizada produce una salida DISTINTA (ver progfte.opt).").append("\n");
         return sb.toString();
     }
 

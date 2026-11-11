@@ -1,0 +1,37 @@
+rafi Demo
+
+decl
+  entero n, base, i, v, x, factor, aux, suma, cuadrados, positivos;
+
+inicio
+  leerdig(n);
+  leerdig(base);
+  i := 0;
+  suma := 0;
+  cuadrados := 0;
+  positivos := 0;
+  mientras (i < n) hacer
+    leerdig(v);
+    factor := base * 3;
+    x := v;
+    aux := x * 7;
+    suma := suma + x * factor * (4 - 3) + 0;
+    cuadrados := cuadrados + (v + base) * (v + base);
+    si (v > 0) entonces
+      si (v > 100) entonces
+        impdig(100);
+      sino
+        positivos := positivos + 1;
+      fin
+    sino
+      impdig(0);
+    fin
+    si (falso) entonces
+      impdig(-1);
+    fin
+    i := i * 1 + 1;
+  fin
+  impdig(suma);
+  impdig(cuadrados);
+  impdig(positivos);
+fin

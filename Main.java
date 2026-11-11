@@ -206,10 +206,11 @@ public class Main {
             }
             opt.verificar(entradasPrueba);
             String contenidoOpt = opt.aTexto();
-            System.out.println("\n" + contenidoOpt);
+            System.out.println("\n" + opt.resumenConsola());
             try {
                 Files.writeString(Path.of(rutaOptimizado), contenidoOpt);
-                System.out.println("Codigo optimizado generado : " + rutaOptimizado);
+                System.out.println("Codigo optimizado generado : " + rutaOptimizado
+                        + " (bloques, variables vivas y bitacora completa)");
             } catch (IOException e) {
                 System.out.println("ERROR: No se pudo escribir el archivo '" + rutaOptimizado + "'");
             }

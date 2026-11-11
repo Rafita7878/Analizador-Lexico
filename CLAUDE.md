@@ -22,13 +22,16 @@ Los `.class` y las salidas `progfte.{dep,tab,tok,ast,sem,ci,opt}` están en `.gi
 
 Cada subcarpeta de `pruebas/` tiene `progfte.txt` y `progfte.in`. `pruebas/Pruebas.java` compara `Ejecutor` vs `InterpreteCuadruplos` (código original) y original vs optimizado; termina con código 1 si hay diferencias. Compila en `out/pruebas` (ignorado por git).
 
+`pruebas/demo` combina todas las pasadas (leerdig dentro de un mientras); las demás carpetas ejercitan una pasada cada una (`plegado`, `cse_*`, `mirilla_*`, `muerto_*`, `licm_*`, …), incluidos casos donde la pasada NO debe actuar. `y` y `o` son palabras reservadas: no se pueden usar como nombres de variable en RAFI.
+
 ## Pipeline (orquestado en `Main.main`)
 1. `depurar()` → `progfte.dep` (sin comentarios `/* */` ni espacios extra)
 2. `AnalizadorLexico.analizar()` → `List<Token>`; `Main.construirTablaSimbolos()` → `progfte.tab`; tokens + errores léxicos → `progfte.tok`
 3. `AnalizadorSintactico` (descendente recursivo) → AST de `NodoArbol` → `progfte.ast`
 4. `AnalizadorSemantico` (solo si no hay errores sintácticos) recorre el AST y construye **su propia** tabla de símbolos → `progfte.sem`
 5. `GeneradorCodigoIntermedio` (solo sin errores sintácticos ni semánticos) → `progfte.ci`
-6. `Ejecutor` interpreta el AST con valores reales; errores de tiempo de ejecución (p. ej. división entre 0) se lanzan como `ErrorEjecucion`
+6. `Optimizador` (Unidad 3) optimiza una copia de los cuádruplos → `progfte.opt` (en consola solo `resumenConsola()`)
+7. `Ejecutor` interpreta el AST con valores reales; errores de tiempo de ejecución (p. ej. división entre 0) se lanzan como `ErrorEjecucion`
 
 `AnalizadorSemantico`, `GeneradorCodigoIntermedio` y `Ejecutor` recorren el mismo AST usando los mismos nombres de nodo como strings (`SENTENCIAS`, `ASIGNACION`, `CONDICIONAL`, `CICLO`, `IMPRESION`, `LECTURA`, `EXPR_LOGICA`, `EXPR_RELACIONAL`, `EXPRESION`, `TERMINO`, `OPERADOR`, `ID`, `CENT`, `CLIT`, `MENOS`, `NO`, `SENTENCIAS_ENTONCES/SINO/CICLO`, …). Si cambias la forma del árbol en `AnalizadorSintactico`, actualiza los tres recorridos.
 
@@ -46,3 +49,15 @@ Cada subcarpeta de `pruebas/` tiene `progfte.txt` y `progfte.in`. `pruebas/Prueb
 
 ## Salida
 No hay GUI: todo es consola + archivos. `GeneradorCodigoIntermedio.aTexto()` arma el texto (sección de tres direcciones, tabla de cuádruplos numerada desde 0, totales de cuádruplos/temporales/etiquetas); `Main` lo imprime en consola y lo escribe en `progfte.ci`.
+
+## Optimización (Unidad 3)
+- **`Optimizador`** recibe `List<Cuadruplo>` + tabla de símbolos del semántico y nunca modifica la lista original. Aplica las pasadas activas en orden, por vueltas, hasta punto fijo (máx. 10), porque unas habilitan a otras. Después `verificar()` ejecuta original y optimizado en `InterpreteCuadruplos` con las mismas entradas y compara lo impreso.
+- **Pasadas** (interfaz `Pasada`, una clase `Pasada*` cada una; orden de registro en el constructor de `Optimizador`): `plegado`, `constantes`, `copias`, `algebraica`, `cse`, `mirilla`, `invariante`, `muerto`. Cada cambio se registra con `ctx.registrar(bloque, antes, despues, motivo)`; la bitácora sale agrupada por pasada.
+- **Alcance**: `constantes`, `copias` y `cse` son locales (por `BloqueBasico`); `muerto` e `invariante` usan `AnalisisVida` (vivas IN/OUT globales); `invariante` detecta ciclos naturales por aristas de regreso.
+- **Invariantes de corrección** que toda pasada debe respetar:
+  - `param x` seguido de `call leerdig/leercad` **define** `x` (usar `AnalisisCuadruplo.usos/definida`, no leer los campos a mano).
+  - Nunca plegar, eliminar ni sacar de un ciclo una `/` cuyo divisor no sea constante ≠ 0: el original debe fallar igual.
+  - Nada es observable salvo lo impreso (ningún archivo muestra valores finales), así que las variables del usuario muertas también se eliminan.
+  - Los temporales `tN` se asignan una sola vez; `copias` fusiona `t = expr; x = t` en `x = expr`, por eso los invariantes suelen tener como destino una variable del usuario.
+  - Para calcular con constantes usar `InterpreteCuadruplos.operar()` (misma semántica que `Ejecutor`: `int` de Java, `y`/`o` sin cortocircuito).
+- **Métricas** (`MetricasCodigo`): cuádruplos, temporales, etiquetas y cuádruplos ejecutados por el intérprete (sin contar `etiq`; una copia cuenta igual que una operación).
