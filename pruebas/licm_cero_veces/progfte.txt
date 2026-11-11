@@ -1,0 +1,18 @@
+rafi LicmCeroVeces
+
+decl
+  entero n, a, i, k, z;
+
+inicio
+  leerdig(n);
+  leerdig(a);
+  k := 100;
+  i := 0;
+  mientras (i < n) hacer
+    k := a * 3;
+    z := a + 1;
+    impdig(z);
+    i := i + 1;
+  fin
+  impdig(k);
+fin

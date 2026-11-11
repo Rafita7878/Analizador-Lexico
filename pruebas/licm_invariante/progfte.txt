@@ -1,0 +1,20 @@
+rafi LicmInvariante
+
+decl
+  entero n, a, b, i, k, m, suma;
+
+inicio
+  leerdig(n);
+  leerdig(a);
+  leerdig(b);
+  i := 0;
+  suma := 0;
+  mientras (i < n) hacer
+    k := a * b;
+    m := a + b;
+    suma := suma + k + m + i;
+    i := i + 1;
+  fin
+  impdig(suma);
+  impdig(m);
+fin

@@ -123,8 +123,12 @@ public class Pruebas {
         if (verbose) {
             System.out.println("  Bitacora:");
             for (CambioOptimizacion c : opt.getBitacora()) System.out.println("    " + c);
-            System.out.println("  Codigo optimizado:");
-            for (Cuadruplo c : optimizado) System.out.println("    " + c.aTresDirecciones());
+            System.out.printf("  %-36s | %s%n", "CODIGO ORIGINAL", "CODIGO OPTIMIZADO");
+            for (int i = 0; i < Math.max(cuads.size(), optimizado.size()); i++) {
+                System.out.printf("  %-36s | %s%n",
+                        i < cuads.size() ? cuads.get(i).aTresDirecciones() : "",
+                        i < optimizado.size() ? optimizado.get(i).aTresDirecciones() : "");
+            }
         }
         return ok;
     }

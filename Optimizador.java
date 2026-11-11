@@ -35,6 +35,7 @@ public class Optimizador {
         registrarPasada(new PasadaAlgebraica());
         registrarPasada(new PasadaSubexpresionesComunes());
         registrarPasada(new PasadaMirilla());
+        registrarPasada(new PasadaCodigoInvariante());
         registrarPasada(new PasadaCodigoMuerto());
     }
 

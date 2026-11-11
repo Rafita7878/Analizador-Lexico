@@ -1,0 +1,19 @@
+rafi LicmDivision
+
+decl
+  entero n, a, d, i, q, h, suma;
+
+inicio
+  leerdig(n);
+  leerdig(a);
+  leerdig(d);
+  i := 0;
+  suma := 0;
+  mientras (i < n) hacer
+    q := a / d;
+    h := a / 2;
+    suma := suma + q + h;
+    i := i + 1;
+  fin
+  impdig(suma);
+fin
