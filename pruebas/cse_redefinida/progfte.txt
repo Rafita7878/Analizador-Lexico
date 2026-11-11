@@ -1,0 +1,22 @@
+rafi CseRedefinida
+
+decl
+  entero a, b, c, d, e, f, g;
+
+inicio
+  leerdig(a);
+  leerdig(b);
+  c := a + b;
+  a := a + 1;
+  d := a + b;
+  leerdig(b);
+  e := a + b;
+  f := a * b;
+  f := 0;
+  g := a * b;
+  impdig(c);
+  impdig(d);
+  impdig(e);
+  impdig(f);
+  impdig(g);
+fin

@@ -1,0 +1,13 @@
+rafi CseRepetida
+
+decl
+  entero a, b, c, d;
+
+inicio
+  leerdig(a);
+  leerdig(b);
+  c := (a + b) * (a + b);
+  d := a + b - 1;
+  impdig(c);
+  impdig(d);
+fin
