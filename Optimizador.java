@@ -23,6 +23,7 @@ public class Optimizador {
     private final Map<String, Boolean> activas = new LinkedHashMap<>();
 
     private ContextoOptimizacion ctx;
+    private List<Cuadruplo> original   = new ArrayList<>();
     private List<Cuadruplo> optimizado = new ArrayList<>();
     private int vueltasRealizadas = 0;
 
@@ -62,6 +63,7 @@ public class Optimizador {
     // ── Punto de entrada ──────────────────────────────────────────────────────
     public List<Cuadruplo> optimizar(List<Cuadruplo> original, Map<String, String[]> tablaSimbolos) {
         ctx = new ContextoOptimizacion(tablaSimbolos);
+        this.original = copiar(original);
         optimizado = copiar(original);
         vueltasRealizadas = 0;
 
@@ -133,6 +135,10 @@ public class Optimizador {
         }
         sb.append("  Vueltas realizadas: ").append(vueltasRealizadas).append("\n\n");
 
+        // ── Bloques básicos del código original ──
+        sb.append(separador).append("  BLOQUES BASICOS (codigo original)\n").append(separador);
+        sb.append(BloqueBasico.aTexto(BloqueBasico.dividir(original), original)).append("\n");
+
         // ── Bitácora ──
         sb.append(separador).append("  CAMBIOS APLICADOS\n").append(separador);
         List<CambioOptimizacion> bitacora = getBitacora();
@@ -145,7 +151,11 @@ public class Optimizador {
 
         // ── Código optimizado ──
         sb.append(separador).append("  CODIGO OPTIMIZADO\n").append(separador);
-        sb.append(formatearCodigo(optimizado));
+        sb.append(formatearCodigo(optimizado)).append("\n");
+
+        // ── Bloques básicos del código optimizado ──
+        sb.append(separador).append("  BLOQUES BASICOS (codigo optimizado)\n").append(separador);
+        sb.append(BloqueBasico.aTexto(BloqueBasico.dividir(optimizado), optimizado));
 
         return sb.toString();
     }
