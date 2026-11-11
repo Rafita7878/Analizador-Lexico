@@ -1,0 +1,15 @@
+rafi Plegado
+
+decl
+  entero a, b;
+  booleano f;
+
+inicio
+  a := 4 * (8 + 2) - 6 / 4;
+  b := -(7) + 100 / 3;
+  f := no (3 > 5);
+  si (f) entonces
+    impdig(a);
+  fin
+  impdig(b);
+fin

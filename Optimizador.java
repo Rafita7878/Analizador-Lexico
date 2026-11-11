@@ -29,6 +29,10 @@ public class Optimizador {
 
     public Optimizador() {
         // Las pasadas se registran aquí conforme se implementan (etapas 3 a 7)
+        registrarPasada(new PasadaPlegado());
+        registrarPasada(new PasadaPropagacionConstantes());
+        registrarPasada(new PasadaPropagacionCopias());
+        registrarPasada(new PasadaAlgebraica());
     }
 
     private void registrarPasada(Pasada p) {
@@ -183,13 +187,7 @@ public class Optimizador {
 
         // ── Bitácora ──
         sb.append(separador).append("  CAMBIOS APLICADOS\n").append(separador);
-        List<CambioOptimizacion> bitacora = getBitacora();
-        if (bitacora.isEmpty()) {
-            sb.append("  Sin cambios.\n");
-        } else {
-            for (CambioOptimizacion c : bitacora) sb.append("  ").append(c).append("\n");
-        }
-        sb.append("\n");
+        sb.append(textoBitacora()).append("\n");
 
         // ── Código optimizado ──
         sb.append(separador).append("  CODIGO OPTIMIZADO\n").append(separador);
@@ -201,6 +199,26 @@ public class Optimizador {
 
         sb.append(textoMetricas()).append("\n");
         sb.append(textoVerificacion());
+        return sb.toString();
+    }
+
+    // Bitácora agrupada por pasada (en el orden de las pasadas), y dentro de
+    // cada grupo en el orden en que ocurrieron los cambios (vN = vuelta).
+    public String textoBitacora() {
+        List<CambioOptimizacion> bitacora = getBitacora();
+        if (bitacora.isEmpty()) return "  Sin cambios.\n";
+        StringBuilder sb = new StringBuilder();
+        for (Pasada p : pasadas) {
+            List<CambioOptimizacion> propios = new ArrayList<>();
+            for (CambioOptimizacion c : bitacora) if (c.pasada.equals(p.nombre())) propios.add(c);
+            if (!activas.get(p.nombre())) {
+                sb.append("  -- ").append(p.descripcion()).append(": DESACTIVADA\n");
+                continue;
+            }
+            sb.append("  -- ").append(p.descripcion()).append(": ")
+              .append(propios.size()).append(" cambio(s)\n");
+            for (CambioOptimizacion c : propios) sb.append("     ").append(c).append("\n");
+        }
         return sb.toString();
     }
 

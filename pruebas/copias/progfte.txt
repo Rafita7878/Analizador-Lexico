@@ -1,0 +1,12 @@
+rafi Copias
+
+decl
+  entero x, w, z;
+
+inicio
+  leerdig(x);
+  w := x;
+  z := w + 1;
+  impdig(z);
+  impdig(w);
+fin
