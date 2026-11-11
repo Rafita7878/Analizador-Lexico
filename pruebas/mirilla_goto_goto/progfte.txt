@@ -1,0 +1,22 @@
+rafi GotoAGoto
+
+decl
+  entero n, i, a;
+
+inicio
+  leerdig(n);
+  i := 0;
+  mientras (i < n) hacer
+    leerdig(a);
+    si (a > 0) entonces
+      si (a > 10) entonces
+        impdig(1);
+      sino
+        impdig(2);
+      fin
+    sino
+      impdig(3);
+    fin
+    i := i + 1;
+  fin
+fin

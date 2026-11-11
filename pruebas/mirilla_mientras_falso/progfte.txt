@@ -1,0 +1,14 @@
+rafi MientrasFalso
+
+decl
+  entero i;
+
+inicio
+  i := 0;
+  impdig(i);
+  mientras (1 > 2) hacer
+    impdig(99);
+    i := i + 1;
+  fin
+  impdig(i);
+fin

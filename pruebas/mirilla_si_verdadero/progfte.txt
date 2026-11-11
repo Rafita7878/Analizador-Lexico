@@ -1,0 +1,14 @@
+rafi SiVerdadero
+
+decl
+  entero x;
+
+inicio
+  leerdig(x);
+  si (3 > 2) entonces
+    impdig(x);
+  sino
+    impdig(0);
+  fin
+  impdig(x + 1);
+fin

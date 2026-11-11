@@ -34,6 +34,7 @@ public class Optimizador {
         registrarPasada(new PasadaPropagacionCopias());
         registrarPasada(new PasadaAlgebraica());
         registrarPasada(new PasadaSubexpresionesComunes());
+        registrarPasada(new PasadaMirilla());
     }
 
     private void registrarPasada(Pasada p) {
