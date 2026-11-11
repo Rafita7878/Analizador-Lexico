@@ -35,6 +35,7 @@ public class Optimizador {
         registrarPasada(new PasadaAlgebraica());
         registrarPasada(new PasadaSubexpresionesComunes());
         registrarPasada(new PasadaMirilla());
+        registrarPasada(new PasadaCodigoMuerto());
     }
 
     private void registrarPasada(Pasada p) {
@@ -187,6 +188,10 @@ public class Optimizador {
         sb.append(separador).append("  BLOQUES BASICOS (codigo original)\n").append(separador);
         sb.append(BloqueBasico.aTexto(BloqueBasico.dividir(original), original)).append("\n");
 
+        // ── Variables vivas del código original ──
+        sb.append(separador).append("  VARIABLES VIVAS POR BLOQUE (codigo original)\n").append(separador);
+        sb.append(AnalisisVida.calcular(original).aTexto()).append("\n");
+
         // ── Bitácora ──
         sb.append(separador).append("  CAMBIOS APLICADOS\n").append(separador);
         sb.append(textoBitacora()).append("\n");
@@ -198,6 +203,9 @@ public class Optimizador {
         // ── Bloques básicos del código optimizado ──
         sb.append(separador).append("  BLOQUES BASICOS (codigo optimizado)\n").append(separador);
         sb.append(BloqueBasico.aTexto(BloqueBasico.dividir(optimizado), optimizado)).append("\n");
+
+        sb.append(separador).append("  VARIABLES VIVAS POR BLOQUE (codigo optimizado)\n").append(separador);
+        sb.append(AnalisisVida.calcular(optimizado).aTexto()).append("\n");
 
         sb.append(textoMetricas()).append("\n");
         sb.append(textoVerificacion());
