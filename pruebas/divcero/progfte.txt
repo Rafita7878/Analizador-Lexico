@@ -1,0 +1,12 @@
+rafi DivCero
+
+decl
+  entero a, d;
+
+inicio
+  leerdig(a);
+  leerdig(d);
+  impdig(a + 1);
+  impdig(a / d);
+  impdig(99);
+fin

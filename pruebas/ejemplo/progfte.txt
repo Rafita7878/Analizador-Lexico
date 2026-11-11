@@ -1,0 +1,15 @@
+rafi Ejemplo1
+
+decl
+  entero edad, doble;
+
+inicio
+  leerdig(edad);
+  edad := 8;
+  doble := 4 * (8 + 2);
+
+  si (doble < edad) entonces
+    impdig(edad);
+  fin
+
+fin

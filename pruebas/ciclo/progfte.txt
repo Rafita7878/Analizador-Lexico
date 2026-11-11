@@ -1,0 +1,17 @@
+rafi Prueba
+
+decl
+  entero i, n;
+
+inicio
+  leerdig(n);
+  i := 0;
+  mientras (i < n) hacer
+    si (i = 2) entonces
+      impdig(i);
+    sino
+      impdig(0);
+    fin
+    i := i + 1;
+  fin
+fin

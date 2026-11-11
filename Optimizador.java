@@ -81,6 +81,48 @@ public class Optimizador {
         return optimizado;
     }
 
+    // ── Verificación ──────────────────────────────────────────────────────────
+    // Ejecuta la lista original y la optimizada con las MISMAS entradas y
+    // compara lo que imprimen. 'entradasArchivo' son las líneas de progfte.in;
+    // si es null se usan los vectores automáticos.
+    public static class Verificacion {
+        public String fuente;
+        public InterpreteCuadruplos.Resultado original, optimizado;
+        public boolean iguales() {
+            return original.observable().equals(optimizado.observable());
+        }
+        public boolean concluyente() {
+            return !original.limiteAlcanzado && !optimizado.limiteAlcanzado;
+        }
+    }
+
+    private final List<Verificacion> verificaciones = new ArrayList<>();
+
+    public List<Verificacion> verificar(List<String> entradasArchivo) {
+        verificaciones.clear();
+        InterpreteCuadruplos interprete = new InterpreteCuadruplos(ctx.getTablaSimbolos());
+        int n = (entradasArchivo != null) ? 1 : InterpreteCuadruplos.vectoresAutomaticos().size();
+        for (int k = 0; k < n; k++) {
+            // Cada ejecución necesita una fuente nueva (las fuentes llevan su posición)
+            Verificacion v = new Verificacion();
+            v.original   = interprete.ejecutar(original,   fuente(entradasArchivo, k));
+            v.optimizado = interprete.ejecutar(optimizado, fuente(entradasArchivo, k));
+            v.fuente     = fuente(entradasArchivo, k).nombre();
+            verificaciones.add(v);
+        }
+        return verificaciones;
+    }
+
+    private static InterpreteCuadruplos.FuenteEntradas fuente(List<String> archivo, int k) {
+        if (archivo != null) return InterpreteCuadruplos.deLista("progfte.in", archivo);
+        return InterpreteCuadruplos.vectoresAutomaticos().get(k);
+    }
+
+    public boolean verificacionCorrecta() {
+        for (Verificacion v : verificaciones) if (!v.iguales()) return false;
+        return true;
+    }
+
     public static List<Cuadruplo> copiar(List<Cuadruplo> lista) {
         List<Cuadruplo> copia = new ArrayList<>();
         for (Cuadruplo c : lista) copia.add(new Cuadruplo(c.op, c.arg1, c.arg2, c.resultado));
@@ -155,8 +197,53 @@ public class Optimizador {
 
         // ── Bloques básicos del código optimizado ──
         sb.append(separador).append("  BLOQUES BASICOS (codigo optimizado)\n").append(separador);
-        sb.append(BloqueBasico.aTexto(BloqueBasico.dividir(optimizado), optimizado));
+        sb.append(BloqueBasico.aTexto(BloqueBasico.dividir(optimizado), optimizado)).append("\n");
 
+        sb.append(textoMetricas()).append("\n");
+        sb.append(textoVerificacion());
+        return sb.toString();
+    }
+
+    public String textoMetricas() {
+        StringBuilder sb = new StringBuilder();
+        String separador = "=".repeat(65) + "\n";
+        MetricasCodigo antes   = MetricasCodigo.calcular(original, ctx);
+        MetricasCodigo despues = MetricasCodigo.calcular(optimizado, ctx);
+
+        sb.append(separador).append("  METRICAS DE COSTO\n").append(separador);
+        sb.append(MetricasCodigo.encabezado());
+        sb.append(MetricasCodigo.fila("Cuadruplos", antes.cuadruplos, despues.cuadruplos));
+        sb.append(MetricasCodigo.fila("Temporales", antes.temporales, despues.temporales));
+        sb.append(MetricasCodigo.fila("Etiquetas",  antes.etiquetas,  despues.etiquetas));
+        for (Verificacion v : verificaciones) {
+            sb.append(MetricasCodigo.fila("Ejecutadas (" + v.fuente + ")",
+                    v.original.instrucciones, v.optimizado.instrucciones));
+        }
+        sb.append("  (Ejecutadas = cuadruplos ejecutados por el interprete, sin contar etiquetas)\n");
+        return sb.toString();
+    }
+
+    public String textoVerificacion() {
+        StringBuilder sb = new StringBuilder();
+        String separador = "=".repeat(65) + "\n";
+        sb.append(separador).append("  VERIFICACION (interprete de cuadruplos)\n").append(separador);
+        if (verificaciones.isEmpty()) return sb.append("  No se ejecuto la verificacion.\n").toString();
+
+        for (Verificacion v : verificaciones) {
+            String estado = !v.iguales() ? "DIFERENTE"
+                    : (v.concluyente() ? "IGUAL" : "IGUAL (no concluyente: limite de pasos)");
+            sb.append("  Entradas: ").append(v.fuente).append("  ->  ").append(estado).append("\n");
+            List<String> a = v.original.observable(), b = v.optimizado.observable();
+            sb.append(String.format("     %-28s | %s%n", "ORIGINAL", "OPTIMIZADO"));
+            for (int i = 0; i < Math.max(a.size(), b.size()); i++) {
+                sb.append(String.format("     %-28s | %s%n",
+                        i < a.size() ? a.get(i) : "", i < b.size() ? b.get(i) : ""));
+            }
+            if (a.isEmpty() && b.isEmpty()) sb.append("     (sin salida)\n");
+        }
+        sb.append("  Resultado: ").append(verificacionCorrecta()
+                ? "la version optimizada produce la MISMA salida."
+                : "ERROR: la version optimizada produce una salida DISTINTA.").append("\n");
         return sb.toString();
     }
 }

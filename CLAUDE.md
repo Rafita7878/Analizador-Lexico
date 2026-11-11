@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Compilador en Java del lenguaje **RAFI** (Lenguajes y Autómatas 2). Código, comentarios y salidas están en español; mantener ese idioma.
 
 ## Compilar y ejecutar
-No hay Maven/Gradle ni tests; todas las clases están en el paquete por defecto en la raíz. Requiere JDK 11+ (proyecto IntelliJ configurado con JDK 21).
+No hay Maven/Gradle; todas las clases están en el paquete por defecto en la raíz (por eso las clases nuevas también van en la raíz: un paquete con nombre no puede importar `Cuadruplo`). Requiere JDK 11+ (proyecto IntelliJ configurado con JDK 21).
 
 ```bash
 javac *.java
@@ -14,7 +14,13 @@ java Main
 ```
 
 `Main` siempre lee `progfte.txt` del directorio actual (ruta fija). Para probar otro programa, edita `progfte.txt`. Si el programa usa `leerdig`/`leercad`, la ejecución pide datos por teclado (stdin).
-Los `.class` y las salidas `progfte.{dep,tab,tok,ast,sem,ci}` están en `.gitignore`.
+Los `.class` y las salidas `progfte.{dep,tab,tok,ast,sem,ci,opt}` están en `.gitignore`. Argumentos de `Main`: `-<pasada>` desactiva una pasada de optimización, `-todas` las desactiva todas. Si existe `progfte.in` (un valor por línea), se usa como entrada para verificar la optimización.
+
+## Pruebas
+    pruebas/ejecutar.sh              # todas las pruebas
+    pruebas/ejecutar.sh ciclo -v     # una prueba, con salidas lado a lado y bitácora
+
+Cada subcarpeta de `pruebas/` tiene `progfte.txt` y `progfte.in`. `pruebas/Pruebas.java` compara `Ejecutor` vs `InterpreteCuadruplos` (código original) y original vs optimizado; termina con código 1 si hay diferencias. Compila en `out/pruebas` (ignorado por git).
 
 ## Pipeline (orquestado en `Main.main`)
 1. `depurar()` → `progfte.dep` (sin comentarios `/* */` ni espacios extra)

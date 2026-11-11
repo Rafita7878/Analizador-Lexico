@@ -36,6 +36,7 @@ public class Main {
         // errores
         String rutaCodigoIntermedio = "progfte.ci";// CAMBIO: codigo de tres direcciones + tabla de cuadruplos
         String rutaOptimizado = "progfte.opt";// Unidad 3: codigo optimizado, bitacora y metricas
+        String rutaEntradas = "progfte.in";// Unidad 3: entradas opcionales para verificar la optimizacion
 
         // Scanner compartido: se usa más adelante SOLO cuando la ejecución
         // real del programa (Ejecutor) llegue a un leerdig/leercad y necesite
@@ -195,6 +196,15 @@ public class Main {
             Optimizador opt = new Optimizador();
             opt.configurar(args).forEach(System.out::println);
             opt.optimizar(gen.getCuadruplos(), sem.getTablaSimbolos());
+            // Entradas para verificar: progfte.in (un valor por línea) si existe,
+            // si no, vectores automáticos de respaldo.
+            List<String> entradasPrueba = null;
+            try {
+                if (Files.exists(Path.of(rutaEntradas))) entradasPrueba = Files.readAllLines(Path.of(rutaEntradas));
+            } catch (IOException e) {
+                System.out.println("ADVERTENCIA: No se pudo leer '" + rutaEntradas + "', se usan vectores automaticos");
+            }
+            opt.verificar(entradasPrueba);
             String contenidoOpt = opt.aTexto();
             System.out.println("\n" + contenidoOpt);
             try {
