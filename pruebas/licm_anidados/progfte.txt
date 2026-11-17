@@ -1,0 +1,23 @@
+rafi LicmAnidados
+
+decl
+  entero n, a, b, i, j, c, d, total;
+
+inicio
+  leerdig(n);
+  leerdig(a);
+  leerdig(b);
+  i := 0;
+  total := 0;
+  mientras (i < n) hacer
+    j := 0;
+    mientras (j < n) hacer
+      c := a * b;
+      d := i * 3;
+      total := total + c + d + j;
+      j := j + 1;
+    fin
+    i := i + 1;
+  fin
+  impdig(total);
+fin

@@ -1,0 +1,14 @@
+rafi MuertoSi
+
+decl
+  entero a, b;
+
+inicio
+  leerdig(a);
+  b := a * 3;
+  si (a > 5) entonces
+    impdig(b);
+  sino
+    impdig(0);
+  fin
+fin

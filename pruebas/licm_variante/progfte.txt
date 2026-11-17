@@ -1,0 +1,21 @@
+rafi LicmVariante
+
+decl
+  entero n, a, i, x, k, p, q, suma;
+
+inicio
+  leerdig(n);
+  leerdig(a);
+  i := 0;
+  suma := 0;
+  mientras (i < n) hacer
+    k := a * i;
+    p := a + 3;
+    a := a + 1;
+    leerdig(x);
+    q := x * 5;
+    suma := suma + k + p + q;
+    i := i + 1;
+  fin
+  impdig(suma);
+fin

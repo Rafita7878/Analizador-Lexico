@@ -1,0 +1,20 @@
+rafi Desconocidos
+
+decl
+  entero n, d, i, suma;
+
+inicio
+  n := 5;
+  leerdig(n);
+  impdig(n + 1);
+  i := 0;
+  suma := 0;
+  mientras (i < n) hacer
+    suma := suma + i;
+    i := i + 1;
+  fin
+  impdig(suma);
+  leerdig(d);
+  impdig(0 / d);
+  impdig(d / d);
+fin

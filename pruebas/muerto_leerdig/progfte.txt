@@ -1,0 +1,10 @@
+rafi MuertoLeerdig
+
+decl
+  entero x, w;
+
+inicio
+  leerdig(x);
+  leerdig(w);
+  impdig(w);
+fin

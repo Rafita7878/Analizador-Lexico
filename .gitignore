@@ -1,0 +1,21 @@
+# Archivos compilados de Java
+*.class
+
+# Carpeta de salida de IntelliJ
+out/
+
+# Configuración local del IDE
+.idea/
+*.iml
+
+# Sistema operativo
+.DS_Store
+
+# Salidas generadas por el compilador RAFI
+*.tok
+*.tab
+*.ast
+*.dep
+*.sem
+*.ci
+*.opt

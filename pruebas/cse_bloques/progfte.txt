@@ -1,0 +1,17 @@
+rafi CseBloques
+
+decl
+  entero a, b, c, d, e;
+
+inicio
+  leerdig(a);
+  leerdig(b);
+  c := a + b;
+  si (a > b) entonces
+    d := a + b;
+    impdig(d);
+  fin
+  e := a + b;
+  impdig(c);
+  impdig(e);
+fin

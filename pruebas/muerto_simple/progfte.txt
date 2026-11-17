@@ -1,0 +1,10 @@
+rafi MuertoSimple
+
+decl
+  entero x;
+
+inicio
+  x := 5;
+  x := 7;
+  impdig(x);
+fin

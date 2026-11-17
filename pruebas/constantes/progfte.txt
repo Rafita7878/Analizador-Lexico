@@ -1,0 +1,11 @@
+rafi Constantes
+
+decl
+  entero base, alto, area;
+
+inicio
+  base := 6;
+  alto := base + 2;
+  area := base * alto;
+  impdig(area);
+fin

@@ -10,6 +10,9 @@
  * 5. Genera el archivo de tabla de símbolos progfte.tab
  * 6. Genera el archivo completo de tokens progfte.tok
  * 7. Muestra el resultado en consola
+ * 8. Analisis sintactico (progfte.ast) y semantico (progfte.sem)
+ * 9. Genera el codigo intermedio: codigo de tres direcciones y cuadruplos (progfte.ci)
+ * 10. Ejecuta el programa
  */
 import java.util.List;
 import java.util.ArrayList;
@@ -31,6 +34,9 @@ public class Main {
         String rutaTokens = "progfte.tok";// archivo completo con tabla de símbolos + lista de tokens + resumen +
         // erroresk";// archivo completo con tabla de símbolos + lista de tokens + resumen +
         // errores
+        String rutaCodigoIntermedio = "progfte.ci";// CAMBIO: codigo de tres direcciones + tabla de cuadruplos
+        String rutaOptimizado = "progfte.opt";// Unidad 3: codigo optimizado, bitacora y metricas
+        String rutaEntradas = "progfte.in";// Unidad 3: entradas opcionales para verificar la optimizacion
 
         // Scanner compartido: se usa más adelante SOLO cuando la ejecución
         // real del programa (Ejecutor) llegue a un leerdig/leercad y necesite
@@ -166,6 +172,50 @@ public class Main {
             System.out.println("Archivo semántico generado : progfte.sem");
         } catch (IOException e) {
             System.out.println("ERROR: No se pudo escribir el archivo 'progfte.sem'");
+        }
+
+        // ── CAMBIO: Generar código intermedio — SOLO si no hay errores ──────────
+        // sintácticos ni semánticos. Recorre el mismo AST y produce el código de
+        // tres direcciones y la tabla de cuádruplos en progfte.ci. Se hace ANTES
+        // de ejecutar para que no dependa de lo que el usuario teclee.
+        if (!sint.tieneErrores() && erroresSem.isEmpty()) {
+            GeneradorCodigoIntermedio gen = new GeneradorCodigoIntermedio();
+            gen.generar(arbol);
+            String contenidoCI = gen.aTexto();
+            System.out.println("\n" + contenidoCI);
+            try {
+                Files.writeString(Path.of(rutaCodigoIntermedio), contenidoCI);
+                System.out.println("Codigo intermedio generado : " + rutaCodigoIntermedio);
+            } catch (IOException e) {
+                System.out.println("ERROR: No se pudo escribir el archivo '" + rutaCodigoIntermedio + "'");
+            }
+
+            // ── Unidad 3: Optimización de código (progfte.opt) ──────────────────
+            // Trabaja sobre una copia de los cuádruplos; la lista original queda intacta.
+            // Argumentos: -nombrePasada desactiva una pasada, -todas desactiva todas.
+            Optimizador opt = new Optimizador();
+            opt.configurar(args).forEach(System.out::println);
+            opt.optimizar(gen.getCuadruplos(), sem.getTablaSimbolos());
+            // Entradas para verificar: progfte.in (un valor por línea) si existe,
+            // si no, vectores automáticos de respaldo.
+            List<String> entradasPrueba = null;
+            try {
+                if (Files.exists(Path.of(rutaEntradas))) entradasPrueba = Files.readAllLines(Path.of(rutaEntradas));
+            } catch (IOException e) {
+                System.out.println("ADVERTENCIA: No se pudo leer '" + rutaEntradas + "', se usan vectores automaticos");
+            }
+            opt.verificar(entradasPrueba);
+            String contenidoOpt = opt.aTexto();
+            System.out.println("\n" + opt.resumenConsola());
+            try {
+                Files.writeString(Path.of(rutaOptimizado), contenidoOpt);
+                System.out.println("Codigo optimizado generado : " + rutaOptimizado
+                        + " (bloques, variables vivas y bitacora completa)");
+            } catch (IOException e) {
+                System.out.println("ERROR: No se pudo escribir el archivo '" + rutaOptimizado + "'");
+            }
+        } else {
+            System.out.println("\n=== CODIGO INTERMEDIO NO GENERADO — corrige los errores anteriores primero ===");
         }
 
         // ── Ejecutar el programa de verdad — SOLO si no hay errores ni ──────────

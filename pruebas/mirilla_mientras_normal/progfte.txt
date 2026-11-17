@@ -1,0 +1,14 @@
+rafi MientrasNormal
+
+decl
+  entero n, i;
+
+inicio
+  leerdig(n);
+  i := 0;
+  mientras (i < n) hacer
+    impdig(i);
+    i := i + 1;
+  fin
+  impdig(100);
+fin

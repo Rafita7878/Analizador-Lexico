@@ -1,0 +1,13 @@
+rafi MuertoDivision
+
+decl
+  entero a, d, c, e;
+
+inicio
+  leerdig(a);
+  leerdig(d);
+  impdig(a);
+  c := a / d;
+  e := a / 2;
+  impdig(a + 1);
+fin

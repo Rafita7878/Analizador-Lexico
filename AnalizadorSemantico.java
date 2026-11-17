@@ -9,6 +9,7 @@ import java.util.*;
 //  - Que impdig/impcad reciban el tipo correcto (entero/cadena).
 //  - Que leerdig/leercad lean sobre una variable del tipo correcto.
 //  - Que las condiciones de 'si' y 'mientras' sean de tipo booleano.
+//  - Que el menos unario '-' se aplique solo a valores de tipo entero.
 public class AnalizadorSemantico {
 
     // Tabla de símbolos propia, construida desde el AST:
@@ -48,6 +49,7 @@ public class AnalizadorSemantico {
     // (bajando por los nodos-envoltorio de un solo hijo: EXPR_LOGICA, EXPR_RELACIONAL,
     // EXPRESION, TERMINO). Si en el camino hay más de un hijo (una operación real),
     // ya no es un literal simple y se considera que no es "0" de forma detectable.
+    // Nota: como MENOS tiene un solo hijo, también detecta "-0" como divisor cero.
     private boolean esLiteralCero(NodoArbol n) {
         if (n == null) return false;
         if (n.tipo.equals("CENT")) return n.valor.equals("0");
@@ -234,6 +236,17 @@ public class AnalizadorSemantico {
                     return "error";
                 }
                 return "booleano";
+            }
+
+            // CAMBIO: menos unario — el operando debe ser entero, el resultado es entero
+            case "MENOS": {
+                String t = tipoDe(n.hijos.get(0));
+                if (!t.equals("entero") && !t.equals("error")) {
+                    registrarError("El menos unario '-' requiere un operando de tipo 'entero' " +
+                            "(se encontró '" + t + "')", n);
+                    return "error";
+                }
+                return t;
             }
 
             case "EXPR_LOGICA": {

@@ -1,0 +1,18 @@
+rafi MuertoMientras
+
+decl
+  entero n, i, prev, suma, aux;
+
+inicio
+  leerdig(n);
+  i := 0;
+  prev := 0;
+  suma := 0;
+  mientras (i < n) hacer
+    suma := suma + prev;
+    aux := i * 3;
+    prev := i * 10;
+    i := i + 1;
+  fin
+  impdig(suma);
+fin
